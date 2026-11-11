@@ -10,6 +10,7 @@
     "consola": "tsx src/presentacion/main.ts",
     "pruebas": "tsx src/pruebas/ejecutarPruebas.ts",
     "pruebas:api": "tsx src/pruebas/pruebasApi.ts",
+    "pruebas:aprendizaje": "tsx src/pruebas/pruebasAprendizaje.ts",
     "cargar-bd": "tsx tools/cargar_bd.ts",
     "construir": "tsc -p tsconfig.build.json",
     "compilar": "tsc --noEmit",

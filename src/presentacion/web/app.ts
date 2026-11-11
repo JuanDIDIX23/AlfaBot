@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import * as path from "path";
 import { ControladorApi, ErrorHttp, RespuestaHttp } from "./ControladorApi";
+import { ControladorAprendizaje } from "./ControladorAprendizaje";
 
 /** Código de PostgreSQL para "violación de restricción única" (dos peticiones registrando el mismo paso). */
 const PG_VIOLACION_UNICA = "23505";
@@ -9,7 +10,7 @@ const PG_VIOLACION_UNICA = "23505";
  * Construye la aplicación HTTP: sirve la interfaz web (carpeta public) y expone la API REST del
  * sistema experto. Es la única pieza que conoce Express; la lógica vive en ControladorApi.
  */
-export function crearApp(controlador: ControladorApi): express.Express {
+export function crearApp(controlador: ControladorApi, aprendizaje?: ControladorAprendizaje): express.Express {
   const app = express();
   app.disable("x-powered-by");
 
@@ -44,6 +45,17 @@ export function crearApp(controlador: ControladorApi): express.Express {
   app.post("/api/evaluaciones", ruta((req) => controlador.iniciar(req.body)));
   app.get("/api/evaluaciones/:id", ruta((req) => controlador.consultar(String(req.params.id))));
   app.post("/api/evaluaciones/:id/respuestas", ruta((req) => controlador.responder(String(req.params.id), req.body)));
+
+  if (aprendizaje) {
+    const p = (req: Request, nombre: string) => String(req.params[nombre]);
+    app.post("/api/evaluaciones/:id/ruta", ruta((req) => aprendizaje.crearRuta(p(req, "id"))));
+    app.get("/api/rutas/:clave", ruta((req) => aprendizaje.consultarRuta(p(req, "clave"))));
+    app.post("/api/rutas/:clave/lecciones/:leccion/rondas", ruta((req) => aprendizaje.nuevaRonda(p(req, "clave"), p(req, "leccion"))));
+    app.post(
+      "/api/rutas/:clave/lecciones/:leccion/resultados",
+      ruta((req) => aprendizaje.terminarRonda(p(req, "clave"), p(req, "leccion"), req.body)),
+    );
+  }
 
   app.use("/api", (_req, res) => {
     res.status(404).json({ error: "No existe esa ruta" });

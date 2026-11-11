@@ -2,7 +2,7 @@
 
 const $ = (id) => document.getElementById(id);
 const CLAVE = "alfabot.evaluacion";
-const pantallas = ["inicio", "pregunta", "resultado"];
+const pantallas = ["inicio", "pregunta", "resultado", "camino", "leccion", "ejercicio", "fin-ronda"];
 
 // ---------------------------------------------------------------- utilidades
 
@@ -83,10 +83,13 @@ function callar() {
   voz.boton = null;
 }
 
-/** Lee en voz alta una lista de textos. Si ya estaba sonando ese mismo botón, lo detiene. */
+/**
+ * Lee en voz alta una lista de textos. Si ya estaba sonando ese mismo botón, lo detiene.
+ * Sin botón (lectura automática) siempre interrumpe lo anterior y empieza de nuevo.
+ */
 function leer(textos, boton) {
   if (!voz.disponible) return;
-  const repetir = voz.boton === boton && speechSynthesis.speaking;
+  const repetir = Boolean(boton) && voz.boton === boton && speechSynthesis.speaking;
   callar();
   if (repetir) return;
 
@@ -148,9 +151,9 @@ function prepararVoz() {
   elegirVoz();
   speechSynthesis.addEventListener?.("voiceschanged", elegirVoz); // Chrome carga las voces tarde
   for (const boton of document.querySelectorAll("button.voz[data-leer]")) {
-    const leerQue = lecturas[boton.dataset.leer];
     boton.hidden = false;
-    boton.addEventListener("click", () => leer(leerQue(), boton));
+    // Se busca al tocar: otros archivos (aprendizaje.js) agregan sus propias lecturas.
+    boton.addEventListener("click", () => leer(lecturas[boton.dataset.leer](), boton));
   }
   window.addEventListener("pagehide", callar);
 }
@@ -217,6 +220,7 @@ function pintarPregunta(estado, regla) {
 function pintarResultado(estado) {
   const r = estado.resultado;
   borrarId(); // la evaluación terminó: ya no hay nada que reanudar
+  $("aprender").dataset.evaluacion = String(estado.evaluacionId);
   $("titulo-resultado").textContent = `${r.ganadora.codigo} · ${r.ganadora.nombre}`;
   $("descripcion").textContent = r.ganadora.descripcion;
   $("confianza").textContent = r.confianzaAlcanzada

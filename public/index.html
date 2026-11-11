@@ -33,6 +33,16 @@
         </div>
       </div>
 
+      <div id="ruta-guardada" class="tarjeta destacada" hidden>
+        <div class="con-voz">
+          <p id="texto-ruta-guardada">Tienes un plan de aprendizaje en marcha.</p>
+          <button type="button" class="voz" data-leer="ruta-guardada" aria-label="Escuchar el aviso del plan" hidden>🔊</button>
+        </div>
+        <div class="acciones">
+          <button type="button" id="seguir-aprendiendo" class="boton">Seguir aprendiendo</button>
+        </div>
+      </div>
+
       <form id="formulario" novalidate>
         <div class="con-voz">
           <label for="alias">¿Cómo te llamas?</label>
@@ -78,7 +88,83 @@
       <ol id="plan" class="plan"></ol>
       <p id="sin-plan" class="nota" hidden>No encontré dificultades que necesiten actividades de refuerzo.</p>
 
-      <button type="button" id="reiniciar" class="boton">Hacer otra evaluación</button>
+      <div class="tarjeta destacada">
+        <div class="con-voz">
+          <p id="texto-aprender">Ahora AlfaBot te enseña: armé un camino de lecciones con ejercicios para que practiques justo lo que necesitas.</p>
+          <button type="button" class="voz" data-leer="aprender" aria-label="Escuchar la invitación a aprender" hidden>🔊</button>
+        </div>
+        <button type="button" id="aprender" class="boton">Empezar a aprender</button>
+      </div>
+      <button type="button" id="reiniciar" class="boton secundario">Hacer otra evaluación</button>
+    </section>
+
+    <!-- ============================================ aprendizaje -->
+
+    <section id="camino" class="pantalla" aria-labelledby="titulo-camino" hidden>
+      <p class="contador">Tu plan de aprendizaje</p>
+      <div class="con-voz">
+        <h1 id="titulo-camino" tabindex="-1"></h1>
+        <button type="button" class="voz" data-leer="camino" aria-label="Escuchar cómo vas" hidden>🔊</button>
+      </div>
+      <p id="avance-texto" class="intro"></p>
+      <div class="pista grande" aria-hidden="true"><div id="avance-barra" class="relleno"></div></div>
+
+      <div id="siguiente-leccion" class="tarjeta destacada" hidden>
+        <p class="contador">Te toca</p>
+        <p id="siguiente-titulo" class="siguiente-titulo"></p>
+        <p id="siguiente-motivo" class="nota"></p>
+        <button type="button" id="practicar-siguiente" class="boton">Practicar ahora</button>
+      </div>
+      <p id="camino-terminado" class="tarjeta destacada" hidden>¡Terminaste tu camino! Puedes repasar cualquier lección cuando quieras.</p>
+
+      <div id="lista-camino"></div>
+      <button type="button" id="nueva-evaluacion" class="boton secundario">Hacer una evaluación nueva</button>
+    </section>
+
+    <section id="leccion" class="pantalla" aria-labelledby="titulo-leccion" hidden>
+      <p class="contador" id="leccion-modulo"></p>
+      <div class="con-voz">
+        <h1 id="titulo-leccion" tabindex="-1"></h1>
+        <button type="button" class="voz" data-leer="leccion" aria-label="Escuchar la explicación" hidden>🔊</button>
+      </div>
+      <p id="leccion-explicacion" class="explicacion"></p>
+      <p class="nota">Son 10 ejercicios. Si aciertas 8 o más, pasas a la siguiente lección.</p>
+      <div class="acciones">
+        <button type="button" id="empezar-ronda" class="boton">Empezar</button>
+        <button type="button" class="boton secundario volver-camino">Volver a mi camino</button>
+      </div>
+    </section>
+
+    <section id="ejercicio" class="pantalla" aria-labelledby="ej-consigna" hidden>
+      <div class="barra-ronda">
+        <span id="ej-contador" class="contador"></span>
+        <div class="pista" aria-hidden="true"><div id="ej-progreso" class="relleno"></div></div>
+        <button type="button" class="enlace volver-camino">Salir</button>
+      </div>
+      <div class="con-voz">
+        <h1 id="ej-consigna" tabindex="-1"></h1>
+        <button type="button" id="ej-escuchar" class="voz grande" aria-label="Escuchar otra vez" hidden>🔊</button>
+      </div>
+      <div id="ej-mostrar" class="mostrar"></div>
+      <div id="ej-zona"></div>
+      <div id="ej-correccion" class="correccion" role="status" hidden>
+        <p id="ej-mensaje"></p>
+        <button type="button" id="ej-siguiente" class="boton">Siguiente</button>
+      </div>
+    </section>
+
+    <section id="fin-ronda" class="pantalla" aria-labelledby="titulo-fin" hidden>
+      <div class="con-voz">
+        <h1 id="titulo-fin" tabindex="-1"></h1>
+        <button type="button" class="voz" data-leer="fin" aria-label="Escuchar el resultado de la ronda" hidden>🔊</button>
+      </div>
+      <p id="fin-aciertos" class="aciertos"></p>
+      <p id="fin-mensaje" class="intro"></p>
+      <p id="fin-dificultades" class="tarjeta" hidden></p>
+      <div class="acciones">
+        <button type="button" id="fin-principal" class="boton"></button>
+        <button type="button" class="boton secundario volver-camino">Volver a mi camino</button>
+      </div>
     </section>
   </main>
 
@@ -87,5 +173,6 @@
   </footer>
 
   <script src="app.js"></script>
+  <script src="aprendizaje.js"></script>
 </body>
 </html>

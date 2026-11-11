@@ -13,3 +13,7 @@ GRANT SELECT, INSERT, UPDATE ON usuarios, evaluaciones, respuestas, inferencias,
 
 -- Las columnas SERIAL usan secuencias
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO alfabot_app;
+
+-- Módulo de aprendizaje (04_aprendizaje.sql)
+GRANT SELECT ON lecciones, lecciones_reglas TO alfabot_app;
+GRANT SELECT, INSERT, UPDATE ON rutas, ruta_lecciones, intentos_ejercicio TO alfabot_app;

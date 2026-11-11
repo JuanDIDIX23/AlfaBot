@@ -9,12 +9,15 @@ import { Conexion } from "../src/datos/Conexion";
  *   PGHOST PGPORT PGUSER PGPASSWORD PGDATABASE   (y PGSSL=true en la nube)
  *
  * Uso:
- *   npm run cargar-bd                 crea las tablas y carga las reglas; falla si ya existen
+ *   npm run cargar-bd                 crea las tablas y carga las reglas y las lecciones.
+ *                                     Si la base ya tiene el diagnóstico pero no el módulo de
+ *                                     aprendizaje, agrega solo ese módulo (sin tocar los datos).
  *   npm run cargar-bd -- --reiniciar  borra las tablas de AlfaBot y vuelve a cargar todo
  *
  * Si se define ALFABOT_APP_PASSWORD, además crea el rol de aplicación `alfabot_app` (permisos mínimos).
  */
 const TABLAS = [
+  "intentos_ejercicio", "ruta_lecciones", "rutas", "lecciones_reglas", "lecciones",
   "diagnosticos", "inferencias", "respuestas", "progreso", "evaluaciones", "usuarios",
   "verosimilitudes", "hipotesis", "reglas", "ramas", "nodos", "modulos",
 ];
@@ -29,15 +32,25 @@ async function main(): Promise<void> {
   const db = Conexion.obtener();
   const cliente = await db.connect();
   try {
-    const existe = await cliente.query(`SELECT to_regclass('public.hipotesis') IS NOT NULL AS existe`);
-    if (existe.rows[0].existe && !reiniciar) {
+    const existe = await cliente.query(
+      `SELECT to_regclass('public.hipotesis') IS NOT NULL AS diagnostico,
+              to_regclass('public.lecciones') IS NOT NULL AS aprendizaje`,
+    );
+    const { diagnostico, aprendizaje } = existe.rows[0];
+    if (diagnostico && aprendizaje && !reiniciar) {
       throw new Error("Las tablas de AlfaBot ya existen. Usa --reiniciar si quieres borrarlas y cargar de nuevo.");
     }
+    const soloAprendizaje = diagnostico && !aprendizaje && !reiniciar;
 
     await cliente.query("BEGIN");
     if (reiniciar) await cliente.query(`DROP TABLE IF EXISTS ${TABLAS.join(", ")} CASCADE`);
-    await cliente.query(leer("01_conocimiento_y_transaccional.sql"));
-    await cliente.query(leer("02_inferencia.sql"));
+    if (soloAprendizaje) {
+      console.log("La base ya tiene el diagnóstico: agrego solo el módulo de aprendizaje.");
+    } else {
+      await cliente.query(leer("01_conocimiento_y_transaccional.sql"));
+      await cliente.query(leer("02_inferencia.sql"));
+    }
+    await cliente.query(leer("04_aprendizaje.sql"));
 
     if (clave !== undefined) {
       const rol = await cliente.query(`SELECT 1 FROM pg_roles WHERE rolname = 'alfabot_app'`);
@@ -51,11 +64,13 @@ async function main(): Promise<void> {
     const c = await cliente.query(`
       SELECT (SELECT count(*) FROM modulos)::int AS modulos, (SELECT count(*) FROM nodos)::int AS nodos,
              (SELECT count(*) FROM ramas)::int AS ramas, (SELECT count(*) FROM reglas)::int AS reglas,
-             (SELECT count(*) FROM hipotesis)::int AS hipotesis, (SELECT count(*) FROM verosimilitudes)::int AS verosimilitudes`);
+             (SELECT count(*) FROM hipotesis)::int AS hipotesis, (SELECT count(*) FROM verosimilitudes)::int AS verosimilitudes,
+             (SELECT count(*) FROM lecciones)::int AS lecciones, (SELECT count(*) FROM lecciones_reglas)::int AS lecciones_reglas`);
     const f = c.rows[0];
     console.log("Base de conocimiento cargada:");
     console.log(`  ${f.modulos} módulos, ${f.nodos} nodos (preguntas), ${f.ramas} ramas (respuestas), ${f.reglas} reglas SI-ENTONCES`);
     console.log(`  ${f.hipotesis} hipótesis, ${f.verosimilitudes} verosimilitudes`);
+    console.log(`  ${f.lecciones} lecciones, ${f.lecciones_reglas} vínculos regla-lección`);
     if (clave !== undefined) console.log("  Rol de aplicación alfabot_app creado con permisos mínimos");
   } catch (e) {
     await cliente.query("ROLLBACK").catch(() => undefined);
