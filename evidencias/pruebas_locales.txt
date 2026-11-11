@@ -1,0 +1,120 @@
+AlfaBot — pruebas locales (2026-11-11, PostgreSQL 17 embebido)
+
+### npm run pruebas:motor
+== Pruebas del motor (sin base de datos) ==
+  OK   Bayes: el posterior suma 1
+  OK   Bayes: la hipótesis con mayor verosimilitud sube
+  OK   Bayes: el orden de las respuestas no altera el resultado
+  OK   Ganancia: una pregunta que no distingue hipótesis aporta 0 bits
+  OK   Ganancia: una pregunta que separa las hipótesis aporta bits positivos
+
+Resumen: 5/5 pruebas del motor.
+
+### npm run pruebas:api -- --omitir-concurrencia
+
+== Servicio ==
+  OK    GET /api/salud llega a la base de conocimiento
+  OK    GET /api/hipotesis devuelve las 5 hipótesis
+  OK    Cabeceras de seguridad presentes
+
+== Evaluación completa por HTTP ==
+  OK    Primera pregunta con 5 creencias a priori de 0,20
+  OK    Opciones siempre elegidas al inicio llevan a H1  (H1 99.7 %)
+  OK    El plan lista actividades con su regla
+  OK    Opciones de mayor avance llevan a H5  (H5 99.8 %)
+
+== Equivalencia con el motor en memoria ==
+  OK    Opción primera: mismo diagnóstico, mismas preguntas y probabilidades  (H1, 5 preguntas, diferencia máxima 2.2e-7)
+  OK    Opción ultima: mismo diagnóstico, mismas preguntas y probabilidades  (H5, 5 preguntas, diferencia máxima 1.4e-7)
+
+== Consulta y estado ==
+  OK    GET de una evaluación terminada devuelve el mismo resultado
+  OK    Consultar no duplica el plan guardado  (2 filas)
+  OK    Una evaluación a medias se reanuda con la misma pregunta
+
+== Usuario reconocido e historial ==
+  OK    Una evaluación nueva entrega la clave aleatoria del usuario
+  OK    Con su clave, el mismo usuario acumula otra evaluación
+  OK    Mismo nombre sin clave es otra persona (no ve el historial ajeno)
+  OK    El historial lista sus evaluaciones (la más reciente primero) y el progreso por módulo  (2 evaluaciones)
+  OK    Una evaluación sin respuestas no muestra nivel
+  OK    Una evaluación terminada muestra su nivel diagnosticado y el progreso por módulo
+  OK    Historial con clave inexistente → 404
+  OK    Historial con clave mal formada → 404
+  OK    Clave de usuario que no es texto → 400
+
+== Entradas inválidas ==
+  OK    Alias vacío → 400  (recibió 400)
+  OK    Sin alias → 400  (recibió 400)
+  OK    Alias demasiado largo → 400  (recibió 400)
+  OK    Alias que no es texto → 400  (recibió 400)
+  OK    JSON mal formado → 400  (recibió 400)
+  OK    Cuerpo demasiado grande → 413  (recibió 413)
+  OK    Evaluación inexistente → 404  (recibió 404)
+  OK    Id que no es número → 404  (recibió 404)
+  OK    Id con inyección SQL → 404  (recibió 404)
+  OK    Responder en evaluación inexistente → 404  (recibió 404)
+  OK    ramaId que no es número → 400  (recibió 400)
+  OK    ramaId de otra pregunta → 400  (recibió 400)
+  OK    Responder una evaluación terminada → 409  (recibió 409)
+  OK    Ruta inexistente de la API → 404  (recibió 404)
+  (omitida) Dos respuestas simultáneas a la misma pregunta
+  OK    La interfaz web se sirve en /
+
+== Rendimiento (RNF-03) ==
+  OK    Todas las respuestas de la API en menos de 2 segundos  (51 peticiones: mediana 39 ms, p95 94 ms, máximo 109 ms)
+
+Resumen: 37/37 verificaciones correctas
+
+### npm run pruebas:aprendizaje
+Generadores de ejercicios
+  OK    hay 25 lecciones y todas usan un generador que existe
+  OK    toda regla remedial tiene al menos una lección
+  OK    las palabras del banco tienen emoji distinto y sílabas que forman la palabra
+  OK    LA1 Las vocales: 50 rondas bien formadas
+  OK    LA2 Vocales al inicio de las palabras: 50 rondas bien formadas
+  OK    LA3 Consonantes que más se usan: 50 rondas bien formadas
+  OK    LA4 Palabras con m, p, s, l y t: 50 rondas bien formadas
+  OK    LA5 No confundir b y d: 50 rondas bien formadas
+  OK    LA6 No confundir p y q: 50 rondas bien formadas
+  OK    LA7 No confundir m y n: 50 rondas bien formadas
+  OK    LA8 Mayúsculas y minúsculas: 50 rondas bien formadas
+  OK    LB1 Sílabas directas: ma, pe, si: 50 rondas bien formadas
+  OK    LB2 Más sílabas directas: fa, re, go, ju: 50 rondas bien formadas
+  OK    LB3 Sílabas inversas: al, es, un: 50 rondas bien formadas
+  OK    LB4 Sílabas mixtas: pan, sol, mar: 50 rondas bien formadas
+  OK    LB5 Sílabas trabadas: pra, tre, bla: 50 rondas bien formadas
+  OK    LB6 No confundir bla y bra: 50 rondas bien formadas
+  OK    LC1 Leer palabras cortas: 50 rondas bien formadas
+  OK    LC2 Armar palabras con sílabas: 50 rondas bien formadas
+  OK    LC3 Palabras largas: 50 rondas bien formadas
+  OK    LC4 Leer palabras largas: 50 rondas bien formadas
+  OK    LC5 Leer oraciones: 50 rondas bien formadas
+  OK    LD1 Entender lo que lees: 50 rondas bien formadas
+  OK    LD2 Pensar más allá del texto: 50 rondas bien formadas
+  OK    LD3 Copiar palabras: 50 rondas bien formadas
+  OK    LD4 Dictado: 50 rondas bien formadas
+  OK    LD5 Armar oraciones: 50 rondas bien formadas
+  OK    LD6 Palabras que concuerdan: 50 rondas bien formadas
+Adaptación
+  OK    misma semilla, misma ronda (reproducible)
+  OK    lo que se falla sale más seguido
+  OK    con dominio (80 % o más) se muestran 4 opciones en lugar de 3
+Armado de la ruta
+  OK    los refuerzos quedan ligados a su regla y en orden pedagógico
+  OK    lo que la persona ya domina se marca superado por el diagnóstico
+  OK    con la alfabetización lograda queda el último módulo como repaso libre
+Recorrido por la API
+  OK    no se puede crear la ruta de una evaluación sin terminar
+  OK    crea la ruta con una clave aleatoria y una sola lección disponible
+  OK    la ruta de una evaluación se crea una sola vez
+  OK    claves inválidas o ajenas no dan acceso
+  OK    una lección bloqueada no se puede practicar
+  OK    rechaza resultados que no corresponden a la lección
+  OK    con 7 de 10 la lección no se supera
+  OK    una ronda incompleta no supera la lección aunque todo esté bien
+  OK    con 8 de 10 se supera y se abre la siguiente lección
+  OK    una lección superada se puede repasar
+  OK    el progreso por módulo queda guardado
+
+45 de 45 pruebas pasaron

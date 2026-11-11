@@ -10,8 +10,9 @@ import { Conexion } from "../src/datos/Conexion";
  *
  * Uso:
  *   npm run cargar-bd                 crea las tablas y carga las reglas y las lecciones.
- *                                     Si la base ya tiene el diagnóstico pero no el módulo de
- *                                     aprendizaje, agrega solo ese módulo (sin tocar los datos).
+ *                                     Si la base ya existe pero le falta una parte (módulo de
+ *                                     aprendizaje o historial), agrega solo lo que falta, sin
+ *                                     tocar los datos.
  *   npm run cargar-bd -- --reiniciar  borra las tablas de AlfaBot y vuelve a cargar todo
  *
  * Si se define ALFABOT_APP_PASSWORD, además crea el rol de aplicación `alfabot_app` (permisos mínimos).
@@ -34,23 +35,25 @@ async function main(): Promise<void> {
   try {
     const existe = await cliente.query(
       `SELECT to_regclass('public.hipotesis') IS NOT NULL AS diagnostico,
-              to_regclass('public.lecciones') IS NOT NULL AS aprendizaje`,
+              to_regclass('public.lecciones') IS NOT NULL AS aprendizaje,
+              EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_schema = 'public' AND table_name = 'usuarios' AND column_name = 'clave') AS historial`,
     );
-    const { diagnostico, aprendizaje } = existe.rows[0];
-    if (diagnostico && aprendizaje && !reiniciar) {
+    const { diagnostico, aprendizaje, historial } = existe.rows[0];
+    if (diagnostico && aprendizaje && historial && !reiniciar) {
       throw new Error("Las tablas de AlfaBot ya existen. Usa --reiniciar si quieres borrarlas y cargar de nuevo.");
     }
-    const soloAprendizaje = diagnostico && !aprendizaje && !reiniciar;
 
     await cliente.query("BEGIN");
     if (reiniciar) await cliente.query(`DROP TABLE IF EXISTS ${TABLAS.join(", ")} CASCADE`);
-    if (soloAprendizaje) {
-      console.log("La base ya tiene el diagnóstico: agrego solo el módulo de aprendizaje.");
-    } else {
+    if (!diagnostico || reiniciar) {
       await cliente.query(leer("01_conocimiento_y_transaccional.sql"));
       await cliente.query(leer("02_inferencia.sql"));
+    } else {
+      console.log("La base ya tiene el diagnóstico: agrego solo lo que falta, sin tocar los datos.");
     }
-    await cliente.query(leer("04_aprendizaje.sql"));
+    if (!aprendizaje || reiniciar) await cliente.query(leer("04_aprendizaje.sql"));
+    await cliente.query(leer("05_historial.sql")); // idempotente
 
     if (clave !== undefined) {
       const rol = await cliente.query(`SELECT 1 FROM pg_roles WHERE rolname = 'alfabot_app'`);

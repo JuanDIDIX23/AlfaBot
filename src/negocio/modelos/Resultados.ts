@@ -58,3 +58,31 @@ export interface EstadoEvaluacion {
   /** Probabilidades del último paso registrado. */
   creencias: { hipotesisId: number; probabilidad: number }[];
 }
+
+/** Usuario reconocido: la clave aleatoria es lo que el navegador guarda para volver a identificarlo. */
+export interface UsuarioIdentificado {
+  id: number;
+  alias: string;
+  clave: string;
+  /** true si se creó en esta petición; false si ya existía (misma clave). */
+  nuevo: boolean;
+}
+
+/** Una evaluación tal como aparece en el historial del usuario. */
+export interface EvaluacionHistorial {
+  evaluacionId: number;
+  fechaInicio: Date;
+  fechaFin: Date | null;
+  estado: "en_curso" | "completada";
+  preguntasRespondidas: number;
+  /** Nivel más probable en el último paso guardado (el diagnóstico, si la evaluación terminó). */
+  ganadora: { codigo: string; nombre: string; probabilidad: number } | null;
+}
+
+export interface HistorialUsuario {
+  alias: string;
+  /** De la más reciente a la más antigua. */
+  evaluaciones: EvaluacionHistorial[];
+  /** Estado más reciente en cada módulo. */
+  progreso: { moduloCodigo: string; moduloNombre: string; estado: "pendiente" | "en_curso" | "superado" }[];
+}

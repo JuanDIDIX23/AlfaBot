@@ -33,7 +33,9 @@ async function main(): Promise<void> {
   const servidor = crearApp(new ControladorApi(servicio, conocimiento)).listen(0);
   const base = `http://127.0.0.1:${(servidor.address() as AddressInfo).port}`;
 
+  const tiempos: number[] = []; // duración de cada petición a la API, para el requisito RNF-03
   const http = async (metodo: string, ruta: string, cuerpo?: unknown, crudo?: string) => {
+    const t0 = performance.now();
     const r = await fetch(base + ruta, {
       method: metodo,
       headers: cuerpo !== undefined || crudo !== undefined ? { "Content-Type": "application/json" } : undefined,
@@ -41,6 +43,7 @@ async function main(): Promise<void> {
     });
     let json: Json = null;
     try { json = await r.json(); } catch { /* sin cuerpo */ }
+    tiempos.push(performance.now() - t0);
     return { estado: r.status, json, cabeceras: r.headers };
   };
 
@@ -113,6 +116,32 @@ async function main(): Promise<void> {
     const reanudada = await http("GET", `/api/evaluaciones/${pausa.json.evaluacionId}`);
     verificar("Una evaluación a medias se reanuda con la misma pregunta", reanudada.json.estado === "en_curso" && reanudada.json.pregunta.nodoCodigo === pausa.json.pregunta.nodoCodigo);
 
+    console.log("\n== Usuario reconocido e historial ==");
+    const u1 = await http("POST", "/api/evaluaciones", { alias: PREFIJO + "historial" });
+    const clave = u1.json.usuario?.clave;
+    verificar("Una evaluación nueva entrega la clave aleatoria del usuario", u1.estado === 201 && /^[0-9a-f-]{36}$/.test(clave ?? "") && u1.json.usuario.nuevo === true);
+    const u2 = await http("POST", "/api/evaluaciones", { alias: PREFIJO + "historial", clave });
+    verificar("Con su clave, el mismo usuario acumula otra evaluación", u2.json.usuario.clave === clave && u2.json.usuario.nuevo === false);
+    const homonimo = await http("POST", "/api/evaluaciones", { alias: PREFIJO + "historial" });
+    verificar("Mismo nombre sin clave es otra persona (no ve el historial ajeno)", homonimo.json.usuario.clave !== clave && homonimo.json.usuario.nuevo === true);
+    const hist = await http("GET", `/api/usuarios/${clave}/historial`);
+    verificar(
+      "El historial lista sus evaluaciones (la más reciente primero) y el progreso por módulo",
+      hist.estado === 200 && hist.json.evaluaciones.length === 2 &&
+        hist.json.evaluaciones[0].evaluacionId === u2.json.evaluacionId && Array.isArray(hist.json.progreso),
+      `${hist.json?.evaluaciones?.length} evaluaciones`,
+    );
+    verificar("Una evaluación sin respuestas no muestra nivel", hist.json.evaluaciones[0].nivel === null);
+    const histA = await http("GET", `/api/usuarios/${a.inicio.json.usuario.clave}/historial`);
+    const terminada = histA.json.evaluaciones.find((e: Json) => e.evaluacionId === a.id);
+    verificar(
+      "Una evaluación terminada muestra su nivel diagnosticado y el progreso por módulo",
+      terminada?.estado === "completada" && terminada?.nivel?.codigo === resA.ganadora.codigo && histA.json.progreso.length === 4,
+    );
+    verificar("Historial con clave inexistente → 404", (await http("GET", "/api/usuarios/00000000-0000-4000-8000-000000000000/historial")).estado === 404);
+    verificar("Historial con clave mal formada → 404", (await http("GET", "/api/usuarios/1%27%20OR%201=1/historial")).estado === 404);
+    verificar("Clave de usuario que no es texto → 400", (await http("POST", "/api/evaluaciones", { alias: "x", clave: 5 })).estado === 400);
+
     console.log("\n== Entradas inválidas ==");
     const casos: [string, Awaited<ReturnType<typeof http>>, number][] = [
       ["Alias vacío → 400", await http("POST", "/api/evaluaciones", { alias: "   " }), 400],
@@ -132,17 +161,35 @@ async function main(): Promise<void> {
     ];
     for (const [nombre, r, esperado] of casos) verificar(nombre, r.estado === esperado, `recibió ${r.estado}`);
 
-    const mismaRama = pausa.json.pregunta.opciones[0].ramaId;
-    const doble = await Promise.all([
-      http("POST", `/api/evaluaciones/${pausa.json.evaluacionId}/respuestas`, { ramaId: mismaRama }),
-      http("POST", `/api/evaluaciones/${pausa.json.evaluacionId}/respuestas`, { ramaId: mismaRama }),
-    ]);
-    const estados = doble.map((r) => r.estado).sort();
-    verificar("Dos respuestas simultáneas a la misma pregunta: una pasa y la otra se rechaza", estados[0] === 200 && (estados[1] === 409 || estados[1] === 400), `estados ${estados.join(" y ")}`);
+    // Una base embebida de una sola conexión (como PGlite) se bloquea con transacciones simultáneas:
+    // ahí se puede omitir esta prueba con --omitir-concurrencia. En PostgreSQL real debe correr.
+    if (process.argv.includes("--omitir-concurrencia")) {
+      console.log("  (omitida) Dos respuestas simultáneas a la misma pregunta");
+    } else {
+      const mismaRama = pausa.json.pregunta.opciones[0].ramaId;
+      const doble = await Promise.all([
+        http("POST", `/api/evaluaciones/${pausa.json.evaluacionId}/respuestas`, { ramaId: mismaRama }),
+        http("POST", `/api/evaluaciones/${pausa.json.evaluacionId}/respuestas`, { ramaId: mismaRama }),
+      ]);
+      const estados = doble.map((r) => r.estado).sort();
+      verificar("Dos respuestas simultáneas a la misma pregunta: una pasa y la otra se rechaza", estados[0] === 200 && (estados[1] === 409 || estados[1] === 400), `estados ${estados.join(" y ")}`);
+    }
 
     const raiz = await fetch(base + "/");
     const html = await raiz.text();
     verificar("La interfaz web se sirve en /", raiz.status === 200 && html.includes("AlfaBot"));
+
+    // RNF-03: cada respuesta del servicio en menos de 2 segundos
+    const orden = [...tiempos].sort((x, y) => x - y);
+    const mediana = orden[Math.floor(orden.length / 2)];
+    const p95 = orden[Math.min(orden.length - 1, Math.floor(orden.length * 0.95))];
+    const maximo = orden[orden.length - 1];
+    console.log("\n== Rendimiento (RNF-03) ==");
+    verificar(
+      "Todas las respuestas de la API en menos de 2 segundos",
+      maximo < 2000,
+      `${orden.length} peticiones: mediana ${mediana.toFixed(0)} ms, p95 ${p95.toFixed(0)} ms, máximo ${maximo.toFixed(0)} ms`,
+    );
   } finally {
     servidor.close();
     try {

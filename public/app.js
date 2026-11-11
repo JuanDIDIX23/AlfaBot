@@ -2,7 +2,8 @@
 
 const $ = (id) => document.getElementById(id);
 const CLAVE = "alfabot.evaluacion";
-const pantallas = ["inicio", "pregunta", "resultado", "camino", "leccion", "ejercicio", "fin-ronda"];
+const pantallas = ["inicio", "pregunta", "resultado", "historial", "camino", "leccion", "ejercicio", "fin-ronda"];
+const CLAVE_USUARIO = "alfabot.usuario";
 
 // ---------------------------------------------------------------- utilidades
 
@@ -14,6 +15,20 @@ function leerId() {
 }
 function borrarId() {
   try { localStorage.removeItem(CLAVE); } catch (_) { /* sin almacenamiento: no pasa nada */ }
+}
+
+/** El usuario que este navegador ya conoce: { clave, alias } o null. */
+function leerUsuario() {
+  try {
+    const u = JSON.parse(localStorage.getItem(CLAVE_USUARIO));
+    return u && typeof u.clave === "string" && typeof u.alias === "string" ? u : null;
+  } catch (_) { return null; }
+}
+function guardarUsuario(usuario) {
+  try { localStorage.setItem(CLAVE_USUARIO, JSON.stringify({ clave: usuario.clave, alias: usuario.alias })); } catch (_) { /* sin almacenamiento */ }
+}
+function olvidarUsuario() {
+  try { localStorage.removeItem(CLAVE_USUARIO); } catch (_) { /* sin almacenamiento */ }
 }
 
 function aviso(texto) {
@@ -266,7 +281,10 @@ async function comenzar(evento) {
   const boton = $("comenzar");
   boton.disabled = true;
   try {
-    const estado = await api("/api/evaluaciones", { method: "POST", body: JSON.stringify({ alias }) });
+    const conocido = leerUsuario();
+    const cuerpo = conocido ? { alias, clave: conocido.clave } : { alias };
+    const estado = await api("/api/evaluaciones", { method: "POST", body: JSON.stringify(cuerpo) });
+    if (estado.usuario) guardarUsuario(estado.usuario);
     guardarId(estado.evaluacionId);
     pintar(estado, null);
   } catch (e) {
@@ -303,8 +321,16 @@ async function continuarEvaluacion() {
 function reiniciar() {
   borrarId();
   $("pendiente").hidden = true;
-  $("alias").value = "";
+  pintarUsuarioConocido();
   mostrar("inicio", $("titulo-inicio"));
+}
+
+/** En el inicio: saluda a quien ya usó la página en este navegador y le deja su nombre escrito. */
+function pintarUsuarioConocido() {
+  const u = leerUsuario();
+  $("usuario-conocido").hidden = !u;
+  $("alias").value = u ? u.alias : "";
+  if (u) $("texto-usuario-conocido").textContent = `Hola de nuevo, ${u.alias}.`;
 }
 
 async function revisarServicio() {
@@ -325,6 +351,7 @@ async function iniciar() {
   $("descartar").addEventListener("click", reiniciar);
   $("reiniciar").addEventListener("click", reiniciar);
   if (leerId()) $("pendiente").hidden = false;
+  pintarUsuarioConocido();
   prepararVoz();
   revisarServicio();
 }

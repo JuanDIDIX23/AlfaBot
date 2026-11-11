@@ -1,6 +1,6 @@
 import { Creencia, Hipotesis } from "./modelos/Hipotesis";
 import { Granulo, MatrizNodo, Nodo } from "./modelos/Conocimiento";
-import { EstadoEvaluacion } from "./modelos/Resultados";
+import { EstadoEvaluacion, HistorialUsuario } from "./modelos/Resultados";
 
 /**
  * Contratos que la capa de negocio exige a la capa de datos (inversión de dependencias):
@@ -21,7 +21,13 @@ export interface IConocimientoRepositorio {
 
 /** Operaciones sobre el sistema transaccional. */
 export interface IEvaluacionRepositorio {
-  crearUsuario(alias: string): Promise<number>;
+  /** Crea un usuario con su clave aleatoria y devuelve su id. */
+  crearUsuario(alias: string, clave: string): Promise<number>;
+  /** Busca un usuario por su clave; null si no existe o la clave no tiene el formato correcto. */
+  usuarioPorClave(clave: string): Promise<{ id: number; alias: string } | null>;
+  actualizarAlias(usuarioId: number, alias: string): Promise<void>;
+  /** Evaluaciones (más recientes primero, hasta 50) y progreso por módulo de un usuario. */
+  historialDeUsuario(usuarioId: number): Promise<HistorialUsuario>;
   crearEvaluacion(usuarioId: number): Promise<number>;
   guardarPrior(evaluacionId: number, creencias: Creencia[]): Promise<void>;
   /** Guarda la respuesta y el estado de las creencias resultante, de forma atómica. */

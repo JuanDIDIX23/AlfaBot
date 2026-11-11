@@ -1,6 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import { PasoRuta } from "../negocio/aprendizaje/ConstructorRuta";
-import { IAprendizajeRepositorio } from "../negocio/aprendizaje/ServicioAprendizaje";
+import { IAprendizajeRepositorio, ResumenRuta } from "../negocio/aprendizaje/ServicioAprendizaje";
 import {
   DiagnosticoParaRuta, Leccion, LeccionEnRuta, ResultadoEjercicio, Ruta,
 } from "../negocio/aprendizaje/Modelos";
@@ -132,6 +132,19 @@ export class AprendizajeRepositorioPg implements IAprendizajeRepositorio {
       };
     });
     return { id: f.id, usuarioId: f.usuario_id, alias: f.alias, evaluacionId: f.evaluacion_id, lecciones };
+  }
+
+  async rutasDeEvaluaciones(evaluacionIds: number[]): Promise<Map<number, ResumenRuta>> {
+    const r = await this.db.query(
+      `SELECT ru.evaluacion_id, ru.clave::text AS clave,
+              count(rl.id) FILTER (WHERE rl.estado = 'superada')::int AS superadas,
+              count(rl.id)::int AS total
+         FROM rutas ru LEFT JOIN ruta_lecciones rl ON rl.ruta_id = ru.id
+        WHERE ru.evaluacion_id = ANY($1::int[])
+        GROUP BY ru.id`,
+      [evaluacionIds],
+    );
+    return new Map(r.rows.map((f) => [f.evaluacion_id as number, { clave: f.clave, superadas: f.superadas, total: f.total }]));
   }
 
   async intentosRecientes(rutaLeccionId: number, limite: number): Promise<ResultadoEjercicio[]> {

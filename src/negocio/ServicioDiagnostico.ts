@@ -1,4 +1,6 @@
+import { randomUUID } from "crypto";
 import { Creencia } from "./modelos/Hipotesis";
+import { HistorialUsuario, UsuarioIdentificado } from "./modelos/Resultados";
 import { IConocimientoRepositorio, IEvaluacionRepositorio } from "./Repositorios";
 import { MotorBayes } from "./MotorBayes";
 import { SelectorPregunta } from "./SelectorPregunta";
@@ -19,10 +21,35 @@ export class ServicioDiagnostico {
     private readonly conocimiento: IConocimientoRepositorio,
     private readonly evaluaciones: IEvaluacionRepositorio,
     private readonly criterio: CriterioParada = new CriterioParada(),
+    private readonly crearClave: () => string = randomUUID,
   ) {}
 
-  async iniciarSesion(alias: string): Promise<SesionDiagnostico> {
-    const usuarioId = await this.evaluaciones.crearUsuario(alias);
+  /**
+   * Reconoce al usuario por la clave que guardó su navegador; si no trae clave (o no existe),
+   * lo registra como nuevo con una clave aleatoria. El nombre no identifica a nadie: dos
+   * personas pueden llamarse igual, y con solo escribir un nombre no se ve el historial de otro.
+   */
+  async identificarUsuario(alias: string, clave?: string): Promise<UsuarioIdentificado> {
+    if (clave) {
+      const existente = await this.evaluaciones.usuarioPorClave(clave);
+      if (existente) {
+        if (existente.alias !== alias) await this.evaluaciones.actualizarAlias(existente.id, alias);
+        return { id: existente.id, alias, clave, nuevo: false };
+      }
+    }
+    const nueva = this.crearClave();
+    const id = await this.evaluaciones.crearUsuario(alias, nueva);
+    return { id, alias, clave: nueva, nuevo: true };
+  }
+
+  /** Atajo para la consola y las pruebas: identifica (o registra) al usuario y abre la evaluación. */
+  async iniciarSesion(alias: string, clave?: string): Promise<SesionDiagnostico> {
+    return this.abrirEvaluacion(await this.identificarUsuario(alias, clave));
+  }
+
+  /** Abre una evaluación nueva para un usuario ya identificado (P1 y P2). */
+  async abrirEvaluacion(usuario: UsuarioIdentificado): Promise<SesionDiagnostico> {
+    const usuarioId = usuario.id;
     const evaluacionId = await this.evaluaciones.crearEvaluacion(usuarioId);
 
     const hipotesis = await this.conocimiento.hipotesis();
@@ -38,6 +65,12 @@ export class ServicioDiagnostico {
       criterio: this.criterio,
       generador: this.generador,
     });
+  }
+
+  /** Historial de un usuario (P8): sus evaluaciones con el nivel de cada una y su progreso por módulo. */
+  async historial(clave: string): Promise<HistorialUsuario | null> {
+    const usuario = await this.evaluaciones.usuarioPorClave(clave);
+    return usuario === null ? null : this.evaluaciones.historialDeUsuario(usuario.id);
   }
 
   /**

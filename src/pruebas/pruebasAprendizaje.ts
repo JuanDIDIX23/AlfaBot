@@ -69,6 +69,26 @@ function validarEjercicio(e: Ejercicio, leccion: Leccion, objetivos: Set<string>
 
 type Json = any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
+/** Borra los datos de prueba (usuarios con el prefijo). El rol de la aplicación no puede borrar: ahí se avisa y se sigue. */
+async function limpiar(db: ReturnType<typeof Conexion.obtener>): Promise<void> {
+  const usuarios = `SELECT id FROM usuarios WHERE alias LIKE $1`;
+  const evaluaciones = `SELECT id FROM evaluaciones WHERE usuario_id IN (${usuarios})`;
+  const rutas = `SELECT id FROM rutas WHERE usuario_id IN (${usuarios})`;
+  try {
+    await db.query(`DELETE FROM intentos_ejercicio WHERE ruta_leccion_id IN (SELECT id FROM ruta_lecciones WHERE ruta_id IN (${rutas}))`, [PREFIJO + "%"]);
+    await db.query(`DELETE FROM ruta_lecciones WHERE ruta_id IN (${rutas})`, [PREFIJO + "%"]);
+    await db.query(`DELETE FROM rutas WHERE usuario_id IN (${usuarios})`, [PREFIJO + "%"]);
+    for (const t of ["diagnosticos", "inferencias", "respuestas"]) {
+      await db.query(`DELETE FROM ${t} WHERE evaluacion_id IN (${evaluaciones})`, [PREFIJO + "%"]);
+    }
+    await db.query(`DELETE FROM evaluaciones WHERE usuario_id IN (${usuarios})`, [PREFIJO + "%"]);
+    await db.query(`DELETE FROM progreso WHERE usuario_id IN (${usuarios})`, [PREFIJO + "%"]);
+    await db.query(`DELETE FROM usuarios WHERE alias LIKE $1`, [PREFIJO + "%"]);
+  } catch (e) {
+    console.log(`\n  (Limpieza omitida: ${e instanceof Error ? e.message : e}. Se borra con un usuario administrador.)`);
+  }
+}
+
 async function main(): Promise<void> {
   const db = Conexion.obtener();
   const repo = new AprendizajeRepositorioPg(db);
@@ -285,6 +305,7 @@ async function main(): Promise<void> {
     }
   } finally {
     servidor.close();
+    await limpiar(db);
     await Conexion.cerrar();
   }
 

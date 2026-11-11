@@ -121,6 +121,15 @@ async function limpiar(): Promise<void> {
 }
 
 async function main(): Promise<void> {
+  // RNF-07: el motor se prueba sin base de datos (npm run pruebas:motor).
+  if (process.argv.includes("--solo-motor")) {
+    const unitarias = pruebasMotor();
+    console.log("== Pruebas del motor (sin base de datos) ==");
+    unitarias.forEach((u) => console.log(`  ${u.ok ? "OK " : "FALLA"}  ${u.nombre}`));
+    const ok = unitarias.filter((u) => u.ok).length;
+    console.log(`\nResumen: ${ok}/${unitarias.length} pruebas del motor.`);
+    process.exit(ok === unitarias.length ? 0 : 1);
+  }
   const db = Conexion.obtener();
   const servicio = new ServicioDiagnostico(new ConocimientoRepositorioPg(db), new EvaluacionRepositorioPg(db));
 

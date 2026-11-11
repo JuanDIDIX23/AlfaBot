@@ -3,6 +3,7 @@ import { SesionDiagnostico } from "../../negocio/SesionDiagnostico";
 import { IConocimientoRepositorio } from "../../negocio/Repositorios";
 import { Creencia } from "../../negocio/modelos/Hipotesis";
 import { Pregunta, ResultadoDiagnostico } from "../../negocio/modelos/Resultados";
+import { ServicioAprendizaje } from "../../negocio/aprendizaje/ServicioAprendizaje";
 
 /** Respuesta HTTP independiente del framework: así el controlador se prueba sin levantar un servidor. */
 export interface RespuestaHttp {
@@ -30,6 +31,7 @@ const ID_MAXIMO = 2_147_483_647;
  *   POST /api/evaluaciones                    abre una evaluación y devuelve la primera pregunta
  *   POST /api/evaluaciones/:id/respuestas     registra una respuesta y devuelve el nuevo estado
  *   GET  /api/evaluaciones/:id                consulta el estado (pregunta pendiente o resultado)
+ *   GET  /api/usuarios/:clave/historial       evaluaciones anteriores, su nivel y el progreso por módulo
  *   GET  /api/hipotesis                       las cinco hipótesis de la base de conocimiento
  *   GET  /api/salud                           verifica que el servicio llega a la base de conocimiento
  */
@@ -37,6 +39,8 @@ export class ControladorApi {
   constructor(
     private readonly servicio: ServicioDiagnostico,
     private readonly conocimiento: IConocimientoRepositorio,
+    /** Opcional: si está, el historial muestra también el avance del camino de aprendizaje. */
+    private readonly aprendizaje?: ServicioAprendizaje,
   ) {}
 
   async salud(): Promise<RespuestaHttp> {
@@ -54,8 +58,44 @@ export class ControladorApi {
 
   async iniciar(cuerpo: unknown): Promise<RespuestaHttp> {
     const alias = this.validarAlias(cuerpo);
-    const sesion = await this.servicio.iniciarSesion(alias);
-    return { estado: 201, cuerpo: await this.estadoDe(sesion, false) };
+    const clave = this.validarClaveOpcional(cuerpo);
+    const usuario = await this.servicio.identificarUsuario(alias, clave);
+    const sesion = await this.servicio.abrirEvaluacion(usuario);
+    return {
+      estado: 201,
+      cuerpo: {
+        ...(await this.estadoDe(sesion, false)),
+        usuario: { clave: usuario.clave, alias: usuario.alias, nuevo: usuario.nuevo },
+      },
+    };
+  }
+
+  async historial(clave: string): Promise<RespuestaHttp> {
+    const h = await this.servicio.historial(clave);
+    if (h === null) throw new ErrorHttp(404, "No encontré tu historial");
+    const rutas = this.aprendizaje
+      ? await this.aprendizaje.rutasDeEvaluaciones(h.evaluaciones.map((e) => e.evaluacionId))
+      : new Map();
+    return {
+      estado: 200,
+      cuerpo: {
+        alias: h.alias,
+        evaluaciones: h.evaluaciones.map((e) => {
+          const ruta = rutas.get(e.evaluacionId);
+          return {
+            evaluacionId: e.evaluacionId,
+            fechaInicio: e.fechaInicio,
+            fechaFin: e.fechaFin,
+            estado: e.estado,
+            preguntasRespondidas: e.preguntasRespondidas,
+            // Sin respuestas todavía, el "nivel" sería solo la probabilidad a priori: no se muestra.
+            nivel: e.preguntasRespondidas > 0 ? e.ganadora : null,
+            ruta: ruta ? { clave: ruta.clave, superadas: ruta.superadas, total: ruta.total } : null,
+          };
+        }),
+        progreso: h.progreso.map((p) => ({ modulo: p.moduloCodigo, nombre: p.moduloNombre, estado: p.estado })),
+      },
+    };
   }
 
   async responder(idTexto: string, cuerpo: unknown): Promise<RespuestaHttp> {
@@ -158,6 +198,14 @@ export class ControladorApi {
     if (limpio.length === 0) throw new ErrorHttp(400, "Falta el nombre");
     if (limpio.length > ALIAS_MAXIMO) throw new ErrorHttp(400, `El nombre no puede pasar de ${ALIAS_MAXIMO} letras`);
     return limpio;
+  }
+
+  /** La clave del usuario es opcional: sin ella (o si no existe) se registra un usuario nuevo. */
+  private validarClaveOpcional(cuerpo: unknown): string | undefined {
+    const clave = (cuerpo as { clave?: unknown }).clave;
+    if (clave === undefined || clave === null) return undefined;
+    if (typeof clave !== "string" || clave.length > 36) throw new ErrorHttp(400, "La clave de usuario no es válida");
+    return clave;
   }
 
   private validarRama(cuerpo: unknown): number {

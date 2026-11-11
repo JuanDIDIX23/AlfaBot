@@ -21,6 +21,14 @@ export interface IAprendizajeRepositorio {
    * el desbloqueo de la siguiente y el progreso por módulo.
    */
   registrarRonda(ruta: Ruta, leccion: LeccionEnRuta, resultados: ResultadoEjercicio[], superada: boolean): Promise<void>;
+  /** Rutas creadas para esas evaluaciones, con su avance (para el historial del usuario). */
+  rutasDeEvaluaciones(evaluacionIds: number[]): Promise<Map<number, ResumenRuta>>;
+}
+
+export interface ResumenRuta {
+  clave: string;
+  superadas: number;
+  total: number;
 }
 
 /** Error de uso del módulo (no de programación): el mensaje se le puede mostrar a la persona. */
@@ -72,6 +80,11 @@ export class ServicioAprendizaje {
     const ruta = await this.repo.rutaPorClave(clave);
     if (ruta === null) throw new Error("La ruta recién creada no se pudo leer");
     return { clave, ruta };
+  }
+
+  /** Avance de las rutas de un grupo de evaluaciones (vacío si ninguna tiene ruta). */
+  rutasDeEvaluaciones(evaluacionIds: number[]): Promise<Map<number, ResumenRuta>> {
+    return evaluacionIds.length === 0 ? Promise.resolve(new Map()) : this.repo.rutasDeEvaluaciones(evaluacionIds);
   }
 
   async ruta(clave: string): Promise<Ruta> {

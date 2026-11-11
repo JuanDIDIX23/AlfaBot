@@ -45,6 +45,7 @@ export function crearApp(controlador: ControladorApi, aprendizaje?: ControladorA
   app.post("/api/evaluaciones", ruta((req) => controlador.iniciar(req.body)));
   app.get("/api/evaluaciones/:id", ruta((req) => controlador.consultar(String(req.params.id))));
   app.post("/api/evaluaciones/:id/respuestas", ruta((req) => controlador.responder(String(req.params.id), req.body)));
+  app.get("/api/usuarios/:clave/historial", ruta((req) => controlador.historial(String(req.params.clave))));
 
   if (aprendizaje) {
     const p = (req: Request, nombre: string) => String(req.params[nombre]);

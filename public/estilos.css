@@ -159,3 +159,19 @@ input[type="text"]:focus-visible, .boton:focus-visible, .opcion:focus-visible, s
 .aciertos { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.6rem; }
 #fin-dificultades { background: var(--naranja-claro); }
 @media (prefers-reduced-motion: reduce) { .pista.grande .relleno, .barra-ronda .relleno { transition: none; } }
+
+/* ============================================ historial */
+#usuario-conocido .acciones { margin-top: 0.6rem; }
+#usuario-conocido .enlace { justify-self: start; padding-left: 0; }
+#resultado .acciones, #camino .acciones { margin-top: 0.6rem; }
+.modulos { list-style: none; padding: 0; margin: 0 0 0.6rem; display: grid; gap: 8px; }
+.modulo-estado { display: flex; justify-content: space-between; align-items: center; gap: 10px; background: #fff; border: 2px solid var(--borde); border-radius: 12px; padding: 10px 12px; font-weight: 600; }
+.estado-chip { flex: none; font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: #dfe5e1; color: var(--tinta); }
+.modulo-estado.superado .estado-chip { background: #e3f4ea; color: #1f6b48; }
+.modulo-estado.en_curso { border-color: var(--verde); }
+.modulo-estado.en_curso .estado-chip { background: var(--verde); color: #fff; }
+.evaluaciones { list-style: none; padding: 0; margin: 0 0 1.4rem; display: grid; gap: 10px; }
+.evaluacion-item { background: #fff; border: 2px solid var(--borde); border-radius: 12px; padding: 12px 14px; }
+.evaluacion-item p { margin: 0 0 0.2rem; }
+.evaluacion-item .titulo { font-weight: 700; }
+.acciones-fila { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 0.6rem; }

@@ -2,15 +2,70 @@ import { Pool } from "pg";
 import { IEvaluacionRepositorio } from "../negocio/Repositorios";
 import { Creencia } from "../negocio/modelos/Hipotesis";
 import { Granulo } from "../negocio/modelos/Conocimiento";
-import { EstadoEvaluacion } from "../negocio/modelos/Resultados";
+import { EstadoEvaluacion, HistorialUsuario } from "../negocio/modelos/Resultados";
+
+const FORMATO_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const LIMITE_HISTORIAL = 50;
 
 /** Escritura en el sistema transaccional (usuarios, evaluaciones, respuestas, inferencias, diagnósticos, progreso). */
 export class EvaluacionRepositorioPg implements IEvaluacionRepositorio {
   constructor(private readonly db: Pool) {}
 
-  async crearUsuario(alias: string): Promise<number> {
-    const r = await this.db.query(`INSERT INTO usuarios (alias) VALUES ($1) RETURNING id`, [alias]);
+  async crearUsuario(alias: string, clave: string): Promise<number> {
+    const r = await this.db.query(`INSERT INTO usuarios (alias, clave) VALUES ($1, $2) RETURNING id`, [alias, clave]);
     return r.rows[0].id;
+  }
+
+  async usuarioPorClave(clave: string): Promise<{ id: number; alias: string } | null> {
+    if (!FORMATO_UUID.test(clave)) return null;
+    const r = await this.db.query(`SELECT id, alias FROM usuarios WHERE clave = $1`, [clave]);
+    return r.rowCount === 0 ? null : { id: r.rows[0].id, alias: r.rows[0].alias };
+  }
+
+  async actualizarAlias(usuarioId: number, alias: string): Promise<void> {
+    await this.db.query(`UPDATE usuarios SET alias = $2 WHERE id = $1`, [usuarioId, alias]);
+  }
+
+  async historialDeUsuario(usuarioId: number): Promise<HistorialUsuario> {
+    const u = await this.db.query(`SELECT alias FROM usuarios WHERE id = $1`, [usuarioId]);
+    // Nivel más probable en el último paso guardado de cada evaluación (el empate lo gana el
+    // nivel más bajo, igual que en el motor).
+    const ev = await this.db.query(
+      `SELECT e.id, e.fecha_inicio, e.fecha_fin, e.estado,
+              (SELECT count(*)::int FROM respuestas r WHERE r.evaluacion_id = e.id) AS preguntas,
+              g.codigo, g.nombre, g.probabilidad
+         FROM evaluaciones e
+         LEFT JOIN LATERAL (
+              SELECT h.codigo, h.nombre, i.probabilidad::float8 AS probabilidad
+                FROM inferencias i JOIN hipotesis h ON h.id = i.hipotesis_id
+               WHERE i.evaluacion_id = e.id
+                 AND i.paso = (SELECT max(paso) FROM inferencias WHERE evaluacion_id = e.id)
+               ORDER BY i.probabilidad DESC, h.nivel
+               LIMIT 1) g ON true
+        WHERE e.usuario_id = $1
+        ORDER BY e.fecha_inicio DESC, e.id DESC
+        LIMIT $2`,
+      [usuarioId, LIMITE_HISTORIAL],
+    );
+    const pr = await this.db.query(
+      `SELECT m.codigo, m.nombre, p.estado
+         FROM progreso p JOIN modulos m ON m.id = p.modulo_id
+        WHERE p.usuario_id = $1
+        ORDER BY m.orden`,
+      [usuarioId],
+    );
+    return {
+      alias: u.rows[0]?.alias ?? "",
+      evaluaciones: ev.rows.map((f) => ({
+        evaluacionId: f.id,
+        fechaInicio: f.fecha_inicio,
+        fechaFin: f.fecha_fin,
+        estado: f.estado,
+        preguntasRespondidas: f.preguntas,
+        ganadora: f.codigo === null ? null : { codigo: f.codigo, nombre: f.nombre, probabilidad: f.probabilidad },
+      })),
+      progreso: pr.rows.map((f) => ({ moduloCodigo: f.codigo, moduloNombre: f.nombre, estado: f.estado })),
+    };
   }
 
   async crearEvaluacion(usuarioId: number): Promise<number> {

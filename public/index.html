@@ -22,6 +22,17 @@
       </div>
       <p class="intro" id="intro-inicio">Te haré unas pocas preguntas para saber en qué punto estás con la lectura y la escritura, y armar un plan de actividades para ti. No es un examen.</p>
 
+      <div id="usuario-conocido" class="tarjeta" hidden>
+        <div class="con-voz">
+          <p id="texto-usuario-conocido"></p>
+          <button type="button" class="voz" data-leer="usuario-conocido" aria-label="Escuchar el saludo" hidden>🔊</button>
+        </div>
+        <div class="acciones">
+          <button type="button" class="boton secundario ver-historial">Ver mis evaluaciones</button>
+          <button type="button" id="otra-persona" class="enlace">No soy yo: empezar como otra persona</button>
+        </div>
+      </div>
+
       <div id="pendiente" class="tarjeta" hidden>
         <div class="con-voz">
           <p id="texto-pendiente">Tienes una evaluación sin terminar.</p>
@@ -95,7 +106,27 @@
         </div>
         <button type="button" id="aprender" class="boton">Empezar a aprender</button>
       </div>
-      <button type="button" id="reiniciar" class="boton secundario">Hacer otra evaluación</button>
+      <div class="acciones">
+        <button type="button" id="reiniciar" class="boton secundario">Hacer otra evaluación</button>
+        <button type="button" class="boton secundario ver-historial">Ver mis evaluaciones</button>
+      </div>
+    </section>
+
+    <section id="historial" class="pantalla" aria-labelledby="titulo-historial" hidden>
+      <p class="contador">Tu historial</p>
+      <div class="con-voz">
+        <h1 id="titulo-historial" tabindex="-1">Mis evaluaciones</h1>
+        <button type="button" class="voz" data-leer="historial" aria-label="Escuchar tu historial" hidden>🔊</button>
+      </div>
+      <h2>Cómo vas en cada módulo</h2>
+      <ul id="historial-modulos" class="modulos"></ul>
+      <h2>Evaluaciones</h2>
+      <ol id="historial-lista" class="evaluaciones"></ol>
+      <p id="historial-vacio" class="nota" hidden>Todavía no tienes evaluaciones.</p>
+      <div class="acciones">
+        <button type="button" id="historial-nueva" class="boton">Hacer una evaluación nueva</button>
+        <button type="button" id="historial-volver" class="boton secundario">Volver al inicio</button>
+      </div>
     </section>
 
     <!-- ============================================ aprendizaje -->
@@ -118,7 +149,10 @@
       <p id="camino-terminado" class="tarjeta destacada" hidden>¡Terminaste tu camino! Puedes repasar cualquier lección cuando quieras.</p>
 
       <div id="lista-camino"></div>
-      <button type="button" id="nueva-evaluacion" class="boton secundario">Hacer una evaluación nueva</button>
+      <div class="acciones">
+        <button type="button" id="nueva-evaluacion" class="boton secundario">Hacer una evaluación nueva</button>
+        <button type="button" class="boton secundario ver-historial">Ver mis evaluaciones</button>
+      </div>
     </section>
 
     <section id="leccion" class="pantalla" aria-labelledby="titulo-leccion" hidden>
@@ -174,5 +208,6 @@
 
   <script src="app.js"></script>
   <script src="aprendizaje.js"></script>
+  <script src="historial.js"></script>
 </body>
 </html>

@@ -9,9 +9,11 @@
     "desarrollo": "tsx src/presentacion/web/servidor.ts",
     "consola": "tsx src/presentacion/main.ts",
     "pruebas": "tsx src/pruebas/ejecutarPruebas.ts",
+    "pruebas:motor": "tsx src/pruebas/ejecutarPruebas.ts --solo-motor",
     "pruebas:api": "tsx src/pruebas/pruebasApi.ts",
     "pruebas:aprendizaje": "tsx src/pruebas/pruebasAprendizaje.ts",
     "cargar-bd": "tsx tools/cargar_bd.ts",
+    "exportar-sql": "tsx tools/exportar_sql.ts",
     "construir": "tsc -p tsconfig.build.json",
     "compilar": "tsc --noEmit",
     "empaquetar": "tsx tools/empaquetar.ts"
