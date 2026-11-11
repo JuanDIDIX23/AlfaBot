@@ -1,0 +1,112 @@
+{
+  "peticion1": {
+    "POST /api/evaluaciones": {
+      "alias": "api-prueba: ejemplo"
+    }
+  },
+  "respuesta1": {
+    "evaluacionId": 145,
+    "estado": "en_curso",
+    "creencias": [
+      {
+        "codigo": "H1",
+        "probabilidad": 0.2
+      },
+      {
+        "codigo": "H2",
+        "probabilidad": 0.2
+      },
+      {
+        "codigo": "H3",
+        "probabilidad": 0.2
+      },
+      {
+        "codigo": "H4",
+        "probabilidad": 0.2
+      },
+      {
+        "codigo": "H5",
+        "probabilidad": 0.2
+      }
+    ],
+    "pregunta": {
+      "nodoCodigo": "C3",
+      "modulo": "C",
+      "texto": "¿Lee oraciones simples?",
+      "numero": 1,
+      "ganancia": 0.649,
+      "opciones": [
+        {
+          "ramaId": 27,
+          "texto": "No logra unir palabras en una oración"
+        },
+        {
+          "ramaId": 28,
+          "texto": "Lee oraciones con pausas excesivas"
+        },
+        {
+          "ramaId": 29,
+          "texto": "Lee oraciones con fluidez"
+        }
+      ]
+    },
+    "resultado": null
+  },
+  "peticion2": {
+    "POST /api/evaluaciones/145/respuestas": {
+      "ramaId": 27
+    }
+  },
+  "respuesta2": {
+    "evaluacionId": 145,
+    "estado": "en_curso",
+    "creencias": [
+      {
+        "codigo": "H1",
+        "probabilidad": 0.3655
+      },
+      {
+        "codigo": "H2",
+        "probabilidad": 0.3655
+      },
+      {
+        "codigo": "H3",
+        "probabilidad": 0.2284
+      },
+      {
+        "codigo": "H4",
+        "probabilidad": 0.0203
+      },
+      {
+        "codigo": "H5",
+        "probabilidad": 0.0203
+      }
+    ],
+    "pregunta": {
+      "nodoCodigo": "B4",
+      "modulo": "B",
+      "texto": "¿Reconoce sílabas trabadas (bl, br, cl, pr, tr)?",
+      "numero": 2,
+      "ganancia": 0.546,
+      "opciones": [
+        {
+          "ramaId": 18,
+          "texto": "No reconoce sílabas trabadas"
+        },
+        {
+          "ramaId": 19,
+          "texto": "Confunde trabadas similares (bl/br)"
+        },
+        {
+          "ramaId": 20,
+          "texto": "Reconoce sílabas trabadas"
+        }
+      ]
+    },
+    "resultado": null,
+    "regla": {
+      "codigo": "R27",
+      "condicion": "No logra unir palabras en una oración"
+    }
+  }
+}

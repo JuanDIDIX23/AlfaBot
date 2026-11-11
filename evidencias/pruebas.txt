@@ -1,0 +1,43 @@
+
+== Pruebas del motor ==
+  OK   Bayes: el posterior suma 1
+  OK   Bayes: la hipótesis con mayor verosimilitud sube
+  OK   Bayes: el orden de las respuestas no altera el resultado
+  OK   Ganancia: una pregunta que no distingue hipótesis aporta 0 bits
+  OK   Ganancia: una pregunta que separa las hipótesis aporta bits positivos
+
+== Escenarios con usuarios simulados ==
+
+  Falla al inicio de su módulo
+    OK   Nivel 1, falla al inicio           esperada H1  obtenida H1  (99.7 %, 5 preguntas)
+    OK   Nivel 2, falla al inicio           esperada H2  obtenida H2  (94.7 %, 5 preguntas)
+    OK   Nivel 3, falla al inicio           esperada H3  obtenida H3  (93.1 %, 5 preguntas)
+    OK   Nivel 4, falla al inicio           esperada H4  obtenida H4  (96.4 %, 5 preguntas)
+    OK   Nivel 5, falla al inicio           esperada H5  obtenida H5  (99.8 %, 5 preguntas)
+
+  Falla solo en el último nodo de su módulo
+    OK   Nivel 1, falla en el último nodo   esperada H1  obtenida H1  (85.1 %, 8 preguntas, sin alcanzar umbral)
+    OK   Nivel 2, falla en el último nodo   esperada H2  obtenida H2  (61.9 %, 10 preguntas, sin alcanzar umbral)
+    OK   Nivel 3, falla en el último nodo   esperada H3  obtenida H3  (89.5 %, 10 preguntas, sin alcanzar umbral)
+    FALLA  Nivel 4, falla en el último nodo   esperada H4  obtenida H5  (80.2 %, 6 preguntas, sin alcanzar umbral)
+
+  Un desliz aislado del usuario
+    OK   Nivel 2, desliz en la pregunta 2   esperada H2  obtenida H2  (91.9 %, 6 preguntas)
+    FALLA  Nivel 2, desliz en la pregunta 3   esperada H2  obtenida H1  (85.1 %, 8 preguntas, sin alcanzar umbral)
+    FALLA  Nivel 3, desliz en la pregunta 2   esperada H3  obtenida H2  (61.9 %, 10 preguntas, sin alcanzar umbral)
+    OK   Nivel 3, desliz en la pregunta 3   esperada H3  obtenida H3  (55.3 %, 9 preguntas, sin alcanzar umbral)
+    OK   Nivel 4, desliz en la pregunta 2   esperada H4  obtenida H4  (93.1 %, 6 preguntas)
+    FALLA  Nivel 4, desliz en la pregunta 3   esperada H4  obtenida H3  (76.6 %, 10 preguntas, sin alcanzar umbral)
+
+== Traza de una evaluación (usuario de nivel 2) ==
+  paso 0 -   -    H1=20.0%  H2=20.0%  H3=20.0%  H4=20.0%  H5=20.0%
+  paso 1 C3  R28  H1=23.8%  H2=23.8%  H3=44.5%  H4=4.0%  H5=4.0%
+  paso 2 B4  R19  H1=30.8%  H2=57.8%  H3=9.6%  H4=0.9%  H5=0.9%
+  paso 3 A3  R10  H1=4.6%  H2=79.7%  H3=13.3%  H4=1.2%  H5=1.2%
+  paso 4 B3  R16  H1=6.3%  H2=92.0%  H3=1.5%  H4=0.1%  H5=0.1%
+  paso 5 A2  R8   H1=1.6%  H2=96.5%  H3=1.6%  H4=0.1%  H5=0.1%
+
+== Persistencia en la base transaccional ==
+  OK   {"respuestas":5,"inferencias":30,"diagnosticos":2,"progreso":4,"estado":"completada"} (inferencias esperadas: 30)
+
+Resumen: 5/5 pruebas del motor, 11/15 escenarios con diagnóstico correcto.

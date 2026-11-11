@@ -1,0 +1,40 @@
+
+== Servicio ==
+  OK    GET /api/salud llega a la base de conocimiento
+  OK    GET /api/hipotesis devuelve las 5 hipótesis
+  OK    Cabeceras de seguridad presentes
+
+== Evaluación completa por HTTP ==
+  OK    Primera pregunta con 5 creencias a priori de 0,20
+  OK    Opciones siempre elegidas al inicio llevan a H1  (H1 99.7 %)
+  OK    El plan lista actividades con su regla
+  OK    Opciones de mayor avance llevan a H5  (H5 99.8 %)
+
+== Equivalencia con el motor en memoria ==
+  OK    Opción primera: mismo diagnóstico, mismas preguntas y probabilidades  (H1, 5 preguntas, diferencia máxima 2.2e-7)
+  OK    Opción ultima: mismo diagnóstico, mismas preguntas y probabilidades  (H5, 5 preguntas, diferencia máxima 1.4e-7)
+
+== Consulta y estado ==
+  OK    GET de una evaluación terminada devuelve el mismo resultado
+  OK    Consultar no duplica el plan guardado  (2 filas)
+  OK    Una evaluación a medias se reanuda con la misma pregunta
+
+== Entradas inválidas ==
+  OK    Alias vacío → 400  (recibió 400)
+  OK    Sin alias → 400  (recibió 400)
+  OK    Alias demasiado largo → 400  (recibió 400)
+  OK    Alias que no es texto → 400  (recibió 400)
+  OK    JSON mal formado → 400  (recibió 400)
+  OK    Cuerpo demasiado grande → 413  (recibió 413)
+  OK    Evaluación inexistente → 404  (recibió 404)
+  OK    Id que no es número → 404  (recibió 404)
+  OK    Id con inyección SQL → 404  (recibió 404)
+  OK    Responder en evaluación inexistente → 404  (recibió 404)
+  OK    ramaId que no es número → 400  (recibió 400)
+  OK    ramaId de otra pregunta → 400  (recibió 400)
+  OK    Responder una evaluación terminada → 409  (recibió 409)
+  OK    Ruta inexistente de la API → 404  (recibió 404)
+  OK    Dos respuestas simultáneas a la misma pregunta: una pasa y la otra se rechaza  (estados 200 y 409)
+  OK    La interfaz web se sirve en /
+
+Resumen: 28/28 verificaciones correctas

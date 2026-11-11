@@ -1,0 +1,21 @@
+import { Conexion } from "../../datos/Conexion";
+import { ConocimientoRepositorioPg } from "../../datos/ConocimientoRepositorioPg";
+import { EvaluacionRepositorioPg } from "../../datos/EvaluacionRepositorioPg";
+import { ServicioDiagnostico } from "../../negocio/ServicioDiagnostico";
+import { crearApp } from "./app";
+import { ControladorApi } from "./ControladorApi";
+
+/** Raíz de composición del servicio web: conecta las tres capas y arranca el servidor HTTP. */
+const db = Conexion.obtener();
+const conocimiento = new ConocimientoRepositorioPg(db);
+const servicio = new ServicioDiagnostico(conocimiento, new EvaluacionRepositorioPg(db));
+const app = crearApp(new ControladorApi(servicio, conocimiento));
+
+const puerto = Number(process.env.PORT ?? 3000);
+const servidor = app.listen(puerto, () => console.log(`AlfaBot escuchando en el puerto ${puerto}`));
+
+const apagar = () => {
+  servidor.close(() => void Conexion.cerrar().then(() => process.exit(0)));
+};
+process.on("SIGTERM", apagar);
+process.on("SIGINT", apagar);

@@ -1,0 +1,27 @@
+ codigo |             nombre              | prior  
+--------+---------------------------------+--------
+ H1     | Reconocimiento de letras        | 0.2000
+ H2     | Conciencia silábica             | 0.2000
+ H3     | Lectura de palabras y oraciones | 0.2000
+ H4     | Comprensión y escritura         | 0.2000
+ H5     | Alfabetización básica lograda   | 0.2000
+(5 rows)
+
+ rama | hip | probabilidad 
+------+-----+--------------
+ B3.1 | H1  |       0.9600
+ B3.1 | H2  |       0.8167
+ B3.1 | H3  |       0.0800
+ B3.1 | H4  |       0.0800
+ B3.1 | H5  |       0.0800
+ B3.2 | H1  |       0.0400
+ B3.2 | H2  |       0.1833
+ B3.2 | H3  |       0.9200
+ B3.2 | H4  |       0.9200
+ B3.2 | H5  |       0.9200
+(10 rows)
+
+ hipotesis_id | round 
+--------------+-------
+(0 rows)
+

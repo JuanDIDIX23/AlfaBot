@@ -1,0 +1,115 @@
+<html><head><meta charset='utf8'><style>
+body{margin:0;background:#FAF7F1;padding:24px;font-family:Helvetica,Arial,sans-serif}
+.win{width:1080px;border-radius:10px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.25);background:#272822}
+.bar{background:#3a3b36;color:#d8d8d0;font:13px 'DejaVu Sans Mono',monospace;padding:9px 14px;display:flex;align-items:center;gap:8px}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+pre{margin:0;padding:14px 16px;font:14px/1.45 'DejaVu Sans Mono',monospace;color:#f8f8f2;white-space:pre}
+.ln{color:#75715e;display:inline-block;width:42px;text-align:right;margin-right:16px;user-select:none}
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.hl .hll { background-color: #49483e }
+.hl { background: #272822; color: #F8F8F2 }
+.hl .c { color: #959077 } /* Comment */
+.hl .err { color: #ED007E; background-color: #1E0010 } /* Error */
+.hl .esc { color: #F8F8F2 } /* Escape */
+.hl .g { color: #F8F8F2 } /* Generic */
+.hl .k { color: #66D9EF } /* Keyword */
+.hl .l { color: #AE81FF } /* Literal */
+.hl .n { color: #F8F8F2 } /* Name */
+.hl .o { color: #FF4689 } /* Operator */
+.hl .x { color: #F8F8F2 } /* Other */
+.hl .p { color: #F8F8F2 } /* Punctuation */
+.hl .ch { color: #959077 } /* Comment.Hashbang */
+.hl .cm { color: #959077 } /* Comment.Multiline */
+.hl .cp { color: #959077 } /* Comment.Preproc */
+.hl .cpf { color: #959077 } /* Comment.PreprocFile */
+.hl .c1 { color: #959077 } /* Comment.Single */
+.hl .cs { color: #959077 } /* Comment.Special */
+.hl .gd { color: #FF4689 } /* Generic.Deleted */
+.hl .ge { color: #F8F8F2; font-style: italic } /* Generic.Emph */
+.hl .ges { color: #F8F8F2; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.hl .gr { color: #FF4689 } /* Generic.Error */
+.hl .gh { color: #F8F8F2 } /* Generic.Heading */
+.hl .gi { color: #A6E22E } /* Generic.Inserted */
+.hl .go { color: #66D9EF } /* Generic.Output */
+.hl .gp { color: #FF4689; font-weight: bold } /* Generic.Prompt */
+.hl .gs { color: #F8F8F2; font-weight: bold } /* Generic.Strong */
+.hl .gu { color: #959077 } /* Generic.Subheading */
+.hl .gt { color: #66D9EF } /* Generic.Traceback */
+.hl .kc { color: #66D9EF } /* Keyword.Constant */
+.hl .kd { color: #66D9EF } /* Keyword.Declaration */
+.hl .kn { color: #FF4689 } /* Keyword.Namespace */
+.hl .kp { color: #66D9EF } /* Keyword.Pseudo */
+.hl .kr { color: #66D9EF } /* Keyword.Reserved */
+.hl .kt { color: #66D9EF } /* Keyword.Type */
+.hl .ld { color: #E6DB74 } /* Literal.Date */
+.hl .m { color: #AE81FF } /* Literal.Number */
+.hl .s { color: #E6DB74 } /* Literal.String */
+.hl .na { color: #A6E22E } /* Name.Attribute */
+.hl .nb { color: #A6E22E } /* Name.Builtin */
+.hl .nc { color: #A6E22E } /* Name.Class */
+.hl .no { color: #66D9EF } /* Name.Constant */
+.hl .nd { color: #A6E22E } /* Name.Decorator */
+.hl .ni { color: #F8F8F2 } /* Name.Entity */
+.hl .ne { color: #A6E22E } /* Name.Exception */
+.hl .nf { color: #A6E22E } /* Name.Function */
+.hl .nl { color: #F8F8F2 } /* Name.Label */
+.hl .nn { color: #F8F8F2 } /* Name.Namespace */
+.hl .nx { color: #A6E22E } /* Name.Other */
+.hl .py { color: #F8F8F2 } /* Name.Property */
+.hl .nt { color: #FF4689 } /* Name.Tag */
+.hl .nv { color: #F8F8F2 } /* Name.Variable */
+.hl .ow { color: #FF4689 } /* Operator.Word */
+.hl .pm { color: #F8F8F2 } /* Punctuation.Marker */
+.hl .w { color: #F8F8F2 } /* Text.Whitespace */
+.hl .mb { color: #AE81FF } /* Literal.Number.Bin */
+.hl .mf { color: #AE81FF } /* Literal.Number.Float */
+.hl .mh { color: #AE81FF } /* Literal.Number.Hex */
+.hl .mi { color: #AE81FF } /* Literal.Number.Integer */
+.hl .mo { color: #AE81FF } /* Literal.Number.Oct */
+.hl .sa { color: #E6DB74 } /* Literal.String.Affix */
+.hl .sb { color: #E6DB74 } /* Literal.String.Backtick */
+.hl .sc { color: #E6DB74 } /* Literal.String.Char */
+.hl .dl { color: #E6DB74 } /* Literal.String.Delimiter */
+.hl .sd { color: #E6DB74 } /* Literal.String.Doc */
+.hl .s2 { color: #E6DB74 } /* Literal.String.Double */
+.hl .se { color: #AE81FF } /* Literal.String.Escape */
+.hl .sh { color: #E6DB74 } /* Literal.String.Heredoc */
+.hl .si { color: #E6DB74 } /* Literal.String.Interpol */
+.hl .sx { color: #E6DB74 } /* Literal.String.Other */
+.hl .sr { color: #E6DB74 } /* Literal.String.Regex */
+.hl .s1 { color: #E6DB74 } /* Literal.String.Single */
+.hl .ss { color: #E6DB74 } /* Literal.String.Symbol */
+.hl .bp { color: #A6E22E } /* Name.Builtin.Pseudo */
+.hl .fm { color: #A6E22E } /* Name.Function.Magic */
+.hl .vc { color: #F8F8F2 } /* Name.Variable.Class */
+.hl .vg { color: #F8F8F2 } /* Name.Variable.Global */
+.hl .vi { color: #F8F8F2 } /* Name.Variable.Instance */
+.hl .vm { color: #F8F8F2 } /* Name.Variable.Magic */
+.hl .il { color: #AE81FF } /* Literal.Number.Integer.Long */
+.term{background:#1b1f1d} .term pre{color:#d8e4dc} .term .bar{background:#2c332f}
+</style></head><body><div class='win '><div class='bar'><span class='dot' style='background:#ff5f56'></span><span class='dot' style='background:#ffbd2e'></span><span class='dot' style='background:#27c93f'></span><span style='margin-left:10px'>src/negocio/SelectorPregunta.ts  (líneas 24–44)</span></div><pre class='hl'><span class='ln'>24</span><span class="w">  </span><span class="nx">gananciaEsperada</span><span class="p">(</span><span class="nx">creencias</span><span class="o">:</span><span class="w"> </span><span class="kt">Creencia</span><span class="p">[],</span><span class="w"> </span><span class="nx">matriz</span><span class="o">:</span><span class="w"> </span><span class="kt">MatrizNodo</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="p">{</span>
+<span class='ln'>25</span><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">priors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">matriz</span><span class="p">.</span><span class="nx">hipotesisIds</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">id</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class='ln'>26</span><span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">creencias</span><span class="p">.</span><span class="nx">find</span><span class="p">((</span><span class="nx">x</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">x</span><span class="p">.</span><span class="nx">hipotesis</span><span class="p">.</span><span class="nx">id</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="nx">id</span><span class="p">);</span>
+<span class='ln'>27</span><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">c</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="sb">`Falta la creencia de la hipótesis </span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+<span class='ln'>28</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="nx">c</span><span class="p">.</span><span class="nx">probabilidad</span><span class="p">;</span>
+<span class='ln'>29</span><span class="w">    </span><span class="p">});</span>
+<span class='ln'>30</span><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">hActual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">motor</span><span class="p">.</span><span class="nx">entropia</span><span class="p">(</span><span class="nx">priors</span><span class="p">);</span>
+<span class='ln'>31</span>
+<span class='ln'>32</span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">hEsperada</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span>
+<span class='ln'>33</span><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">fila</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">matriz</span><span class="p">.</span><span class="nx">verosimilitud</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class='ln'>34</span><span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">conjunta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">fila</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">lik</span><span class="p">,</span><span class="w"> </span><span class="nx">j</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">lik</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">priors</span><span class="p">[</span><span class="nx">j</span><span class="p">]);</span>
+<span class='ln'>35</span><span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">pRespuesta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">conjunta</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">b</span><span class="p">,</span><span class="w"> </span><span class="mf">0</span><span class="p">);</span>
+<span class='ln'>36</span><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">pRespuesta</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span>
+<span class='ln'>37</span><span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">posterior</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">conjunta</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">v</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">v</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nx">pRespuesta</span><span class="p">);</span>
+<span class='ln'>38</span><span class="w">      </span><span class="nx">hEsperada</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="nx">pRespuesta</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">motor</span><span class="p">.</span><span class="nx">entropia</span><span class="p">(</span><span class="nx">posterior</span><span class="p">);</span>
+<span class='ln'>39</span><span class="w">    </span><span class="p">}</span>
+<span class='ln'>40</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">hActual</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">hEsperada</span><span class="p">;</span>
+<span class='ln'>41</span><span class="w">  </span><span class="p">}</span>
+<span class='ln'>42</span>
+<span class='ln'>43</span><span class="w">  </span><span class="nx">elegir</span><span class="p">(</span><span class="nx">creencias</span><span class="o">:</span><span class="w"> </span><span class="kt">Creencia</span><span class="p">[],</span><span class="w"> </span><span class="nx">matrices</span><span class="o">:</span><span class="w"> </span><span class="kt">MatrizNodo</span><span class="p">[])</span><span class="o">:</span><span class="w"> </span><span class="nx">CandidataPregunta</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="p">{</span>
+<span class='ln'>44</span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">mejor</span><span class="o">:</span><span class="w"> </span><span class="kt">CandidataPregunta</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class='ln'>45</span></pre></div></body></html>

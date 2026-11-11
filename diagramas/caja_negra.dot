@@ -1,0 +1,50 @@
+digraph CajaNegra {
+  bgcolor="#FAF7F1";
+  rankdir=LR;
+  nodesep=0.45;
+  ranksep=1.6;
+  node [fontname="Helvetica", fontsize=14];
+  edge [fontname="Helvetica", fontsize=12, color="#5B6560", fontcolor="#3C443F", arrowsize=0.9, penwidth=1.4];
+
+  // ---------- Entradas ----------
+  subgraph cluster_in {
+    label="ENTRADAS"; fontname="Helvetica-Bold"; fontsize=13; fontcolor="#3E7C72";
+    style="rounded"; color="#3E7C72"; margin=18;
+    e1 [shape=box, style="rounded,filled", fillcolor="white", color="#3E7C72", margin="0.22,0.14",
+        label="Respuestas del usuario\n(rama elegida en cada pregunta)"];
+    e2 [shape=box, style="rounded,filled", fillcolor="white", color="#3E7C72", margin="0.22,0.14",
+        label="Conocimiento del experto\n(hipótesis, nodos, ramas, reglas\ny verosimilitudes)"];
+    e3 [shape=box, style="rounded,filled", fillcolor="white", color="#3E7C72", margin="0.22,0.14",
+        label="Parámetros de inferencia\n(probabilidad a priori, umbral\nde confianza, mínimo de preguntas)"];
+  }
+
+  // ---------- Caja negra ----------
+  caja [shape=box, style="filled", fillcolor="#1E2A24", fontcolor="white", color="#1E2A24",
+        width=3.2, height=3.4, margin="0.3,0.3", fontsize=18,
+        label=<<b>Sistema de inferencia</b><br/><b>AlfaBot</b><br/><br/><font point-size="13">Identifica 5 hipótesis con su</font><br/><font point-size="13">peso probabilístico a partir</font><br/><font point-size="13">de las respuestas del usuario</font>>];
+
+  // ---------- Salidas ----------
+  subgraph cluster_out {
+    label="SALIDAS"; fontname="Helvetica-Bold"; fontsize=13; fontcolor="#C1652F";
+    style="rounded"; color="#C1652F"; margin=18;
+    s1 [shape=box, style="rounded,filled", fillcolor="#FDEEE3", color="#C1652F", margin="0.22,0.14",
+        label="Siguiente pregunta\n(la que más información aporta)"];
+    s2 [shape=box, style="rounded,filled", fillcolor="#FDEEE3", color="#C1652F", margin="0.22,0.14",
+        label="Probabilidad de las\n5 hipótesis (H1 a H5)"];
+    s3 [shape=box, style="rounded,filled", fillcolor="#FDEEE3", color="#C1652F", margin="0.22,0.14",
+        label="Diagnóstico de nivel\n(hipótesis más probable)"];
+    s4 [shape=box, style="rounded,filled", fillcolor="#FDEEE3", color="#C1652F", margin="0.22,0.14",
+        label="Plan de actividades\ncon la regla que lo justifica"];
+    s5 [shape=box, style="rounded,filled", fillcolor="#FDEEE3", color="#C1652F", margin="0.22,0.14",
+        label="Registro de la evaluación\n(respuestas, inferencias, progreso)"];
+  }
+
+  e1 -> caja [color="#3E7C72"];
+  e2 -> caja [color="#3E7C72"];
+  e3 -> caja [color="#3E7C72"];
+  caja -> s1 [color="#C1652F"];
+  caja -> s2 [color="#C1652F"];
+  caja -> s3 [color="#C1652F"];
+  caja -> s4 [color="#C1652F"];
+  caja -> s5 [color="#C1652F"];
+}

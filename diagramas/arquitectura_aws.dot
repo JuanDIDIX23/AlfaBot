@@ -1,0 +1,35 @@
+digraph Nube {
+  bgcolor="#FAF7F1"; rankdir=TB; nodesep=0.6; ranksep=0.65; compound=true;
+  node [fontname="Helvetica", fontsize=13, shape=box, style="rounded,filled", fillcolor="white", color="#3E7C72", penwidth=1.8, margin="0.22,0.14"];
+  edge [fontname="Helvetica", fontsize=11, color="#5B6560", fontcolor="#3C443F", penwidth=1.4, arrowsize=0.8];
+
+  usuario [shape=box, style=filled, fillcolor="#1E2A24", fontcolor=white, color="#1E2A24",
+           label="Usuario\n(navegador web)"];
+
+  subgraph cluster_aws {
+    label=<<b>Amazon Web Services</b>>; fontname="Helvetica"; fontsize=14; fontcolor="#1E2A24";
+    style="rounded,dashed"; color="#8A948F"; margin=18;
+
+    subgraph cluster_eb {
+      label=<<b>AWS Elastic Beanstalk</b><br/>(instancia EC2, Node.js 22)>; fontname="Helvetica"; fontsize=13;
+      style="rounded,filled"; fillcolor="#EEF5F3"; color="#3E7C72"; margin=14;
+      web  [label=<<b>Interfaz web</b><br/>HTML, CSS y JavaScript<br/>(carpeta public)>];
+      api  [label=<<b>API REST</b><br/>Capa de presentación<br/>/api/evaluaciones>];
+      neg  [label=<<b>Motor de inferencia</b><br/>Capa de negocio<br/>Bayes + ganancia de información>];
+      dat  [label=<<b>Repositorios</b><br/>Capa de datos<br/>consultas granulares>];
+      {rank=same; web; api;} web -> api [style=invis]; api -> neg [label="  DTO"]; neg -> dat [label="  4 consultas\n  sucesivas"];
+    }
+
+    subgraph cluster_pg {
+      label=<<b>Amazon RDS for PostgreSQL</b>>; fontname="Helvetica"; fontsize=13;
+      style="rounded,filled"; fillcolor="#FDF3EB"; color="#C1652F"; margin=14;
+      kb  [label=<<b>Base de conocimiento</b><br/>módulos, nodos, ramas, reglas,<br/>hipótesis, verosimilitudes>, color="#3E7C72"];
+      tx  [label=<<b>Base transaccional</b><br/>usuarios, evaluaciones, respuestas,<br/>inferencias, diagnósticos, progreso>, color="#C1652F"];
+    }
+  }
+
+  usuario -> web [label=" HTTP\n página"];
+  usuario -> api [label=" HTTP (JSON)"];
+  dat -> kb [label=" lectura", color="#3E7C72", fontcolor="#3E7C72"];
+  dat -> tx [label=" lectura y escritura", color="#C1652F", fontcolor="#C1652F"];
+}

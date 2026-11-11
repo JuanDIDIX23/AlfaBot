@@ -1,0 +1,310 @@
+{
+  "unitarias": [
+    {
+      "nombre": "Bayes: el posterior suma 1",
+      "ok": true
+    },
+    {
+      "nombre": "Bayes: la hipótesis con mayor verosimilitud sube",
+      "ok": true
+    },
+    {
+      "nombre": "Bayes: el orden de las respuestas no altera el resultado",
+      "ok": true
+    },
+    {
+      "nombre": "Ganancia: una pregunta que no distingue hipótesis aporta 0 bits",
+      "ok": true
+    },
+    {
+      "nombre": "Ganancia: una pregunta que separa las hipótesis aporta bits positivos",
+      "ok": true
+    }
+  ],
+  "filas": [
+    {
+      "grupo": "Falla al inicio de su módulo",
+      "perfil": "Nivel 1, falla al inicio",
+      "esperada": "H1",
+      "obtenida": "H1",
+      "probabilidad": 0.997398004614583,
+      "preguntas": 5,
+      "confianza": true,
+      "correcta": true
+    },
+    {
+      "grupo": "Falla al inicio de su módulo",
+      "perfil": "Nivel 2, falla al inicio",
+      "esperada": "H2",
+      "obtenida": "H2",
+      "probabilidad": 0.9466460777031448,
+      "preguntas": 5,
+      "confianza": true,
+      "correcta": true
+    },
+    {
+      "grupo": "Falla al inicio de su módulo",
+      "perfil": "Nivel 3, falla al inicio",
+      "esperada": "H3",
+      "obtenida": "H3",
+      "probabilidad": 0.9305321890991906,
+      "preguntas": 5,
+      "confianza": true,
+      "correcta": true
+    },
+    {
+      "grupo": "Falla al inicio de su módulo",
+      "perfil": "Nivel 4, falla al inicio",
+      "esperada": "H4",
+      "obtenida": "H4",
+      "probabilidad": 0.9636728239236517,
+      "preguntas": 5,
+      "confianza": true,
+      "correcta": true
+    },
+    {
+      "grupo": "Falla al inicio de su módulo",
+      "perfil": "Nivel 5, falla al inicio",
+      "esperada": "H5",
+      "obtenida": "H5",
+      "probabilidad": 0.997616621564385,
+      "preguntas": 5,
+      "confianza": true,
+      "correcta": true
+    },
+    {
+      "grupo": "Falla solo en el último nodo de su módulo",
+      "perfil": "Nivel 1, falla en el último nodo",
+      "esperada": "H1",
+      "obtenida": "H1",
+      "probabilidad": 0.8508328884239087,
+      "preguntas": 8,
+      "confianza": false,
+      "correcta": true
+    },
+    {
+      "grupo": "Falla solo en el último nodo de su módulo",
+      "perfil": "Nivel 2, falla en el último nodo",
+      "esperada": "H2",
+      "obtenida": "H2",
+      "probabilidad": 0.6192964163923712,
+      "preguntas": 10,
+      "confianza": false,
+      "correcta": true
+    },
+    {
+      "grupo": "Falla solo en el último nodo de su módulo",
+      "perfil": "Nivel 3, falla en el último nodo",
+      "esperada": "H3",
+      "obtenida": "H3",
+      "probabilidad": 0.8952551072087412,
+      "preguntas": 10,
+      "confianza": false,
+      "correcta": true
+    },
+    {
+      "grupo": "Falla solo en el último nodo de su módulo",
+      "perfil": "Nivel 4, falla en el último nodo",
+      "esperada": "H4",
+      "obtenida": "H5",
+      "probabilidad": 0.8017693048161583,
+      "preguntas": 6,
+      "confianza": false,
+      "correcta": false
+    },
+    {
+      "grupo": "Un desliz aislado del usuario",
+      "perfil": "Nivel 2, desliz en la pregunta 2",
+      "esperada": "H2",
+      "obtenida": "H2",
+      "probabilidad": 0.9185098692788816,
+      "preguntas": 6,
+      "confianza": true,
+      "correcta": true
+    },
+    {
+      "grupo": "Un desliz aislado del usuario",
+      "perfil": "Nivel 2, desliz en la pregunta 3",
+      "esperada": "H2",
+      "obtenida": "H1",
+      "probabilidad": 0.8508328884239087,
+      "preguntas": 8,
+      "confianza": false,
+      "correcta": false
+    },
+    {
+      "grupo": "Un desliz aislado del usuario",
+      "perfil": "Nivel 3, desliz en la pregunta 2",
+      "esperada": "H3",
+      "obtenida": "H2",
+      "probabilidad": 0.6192964163923712,
+      "preguntas": 10,
+      "confianza": false,
+      "correcta": false
+    },
+    {
+      "grupo": "Un desliz aislado del usuario",
+      "perfil": "Nivel 3, desliz en la pregunta 3",
+      "esperada": "H3",
+      "obtenida": "H3",
+      "probabilidad": 0.5533209696466578,
+      "preguntas": 9,
+      "confianza": false,
+      "correcta": true
+    },
+    {
+      "grupo": "Un desliz aislado del usuario",
+      "perfil": "Nivel 4, desliz en la pregunta 2",
+      "esperada": "H4",
+      "obtenida": "H4",
+      "probabilidad": 0.9309248646996856,
+      "preguntas": 6,
+      "confianza": true,
+      "correcta": true
+    },
+    {
+      "grupo": "Un desliz aislado del usuario",
+      "perfil": "Nivel 4, desliz en la pregunta 3",
+      "esperada": "H4",
+      "obtenida": "H3",
+      "probabilidad": 0.7658669581398315,
+      "preguntas": 10,
+      "confianza": false,
+      "correcta": false
+    }
+  ],
+  "traza": [
+    {
+      "paso": 0,
+      "nodo": "-",
+      "pregunta": "Probabilidades a priori",
+      "respuesta": "-",
+      "regla": "-",
+      "probabilidades": {
+        "H1": 0.2,
+        "H2": 0.2,
+        "H3": 0.2,
+        "H4": 0.2,
+        "H5": 0.2
+      }
+    },
+    {
+      "paso": 1,
+      "nodo": "C3",
+      "pregunta": "¿Lee oraciones simples?",
+      "respuesta": "Lee oraciones con pausas excesivas",
+      "regla": "R28",
+      "probabilidades": {
+        "H1": 0.2376,
+        "H2": 0.2376,
+        "H3": 0.4455,
+        "H4": 0.0396,
+        "H5": 0.0396
+      }
+    },
+    {
+      "paso": 2,
+      "nodo": "B4",
+      "pregunta": "¿Reconoce sílabas trabadas (bl, br, cl, pr, tr)?",
+      "respuesta": "Confunde trabadas similares (bl/br)",
+      "regla": "R19",
+      "probabilidades": {
+        "H1": 0.3084,
+        "H2": 0.5782,
+        "H3": 0.0964,
+        "H4": 0.0086,
+        "H5": 0.0086
+      }
+    },
+    {
+      "paso": 3,
+      "nodo": "A3",
+      "pregunta": "¿Diferencia mayúsculas de minúsculas?",
+      "respuesta": "Diferencia mayúsculas de minúsculas",
+      "regla": "R10",
+      "probabilidades": {
+        "H1": 0.0462,
+        "H2": 0.7973,
+        "H3": 0.1329,
+        "H4": 0.0118,
+        "H5": 0.0118
+      }
+    },
+    {
+      "paso": 4,
+      "nodo": "B3",
+      "pregunta": "¿Reconoce sílabas mixtas (consonante-vocal-consonante: pan, sol)?",
+      "respuesta": "No reconoce sílabas mixtas",
+      "regla": "R16",
+      "probabilidades": {
+        "H1": 0.0627,
+        "H2": 0.9196,
+        "H3": 0.015,
+        "H4": 0.0013,
+        "H5": 0.0013
+      }
+    },
+    {
+      "paso": 5,
+      "nodo": "A2",
+      "pregunta": "¿Reconoce consonantes de alta frecuencia (m, p, s, l, t)?",
+      "respuesta": "Reconoce correctamente las consonantes frecuentes",
+      "regla": "R8",
+      "probabilidades": {
+        "H1": 0.0161,
+        "H2": 0.9654,
+        "H3": 0.0158,
+        "H4": 0.0014,
+        "H5": 0.0014
+      }
+    }
+  ],
+  "planTraza": [
+    {
+      "moduloCodigo": "B",
+      "reglaCodigo": "R16",
+      "ramaCodigo": "B3.1",
+      "condicion": "No reconoce sílabas mixtas",
+      "accion": "practicar sílabas mixtas con apoyo de imágenes y palabras cotidianas"
+    },
+    {
+      "moduloCodigo": "B",
+      "reglaCodigo": "R19",
+      "ramaCodigo": "B4.2",
+      "condicion": "Confunde trabadas similares (bl/br)",
+      "accion": "aplicar ejercicios de discriminación auditiva específicos"
+    }
+  ],
+  "persistencia": {
+    "respuestas": 5,
+    "inferencias": 30,
+    "diagnosticos": 2,
+    "progreso": 4,
+    "estado": "completada"
+  },
+  "persistenciaOk": true,
+  "progreso": [
+    {
+      "codigo": "A",
+      "estado": "superado"
+    },
+    {
+      "codigo": "B",
+      "estado": "en_curso"
+    },
+    {
+      "codigo": "C",
+      "estado": "pendiente"
+    },
+    {
+      "codigo": "D",
+      "estado": "pendiente"
+    }
+  ],
+  "totales": {
+    "unitariasOk": 5,
+    "unitarias": 5,
+    "escenariosOk": 11,
+    "escenarios": 15
+  }
+}

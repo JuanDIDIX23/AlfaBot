@@ -1,0 +1,6 @@
+node_modules/
+dist/
+despliegue/
+.env
+*.log
+despliegue.zip

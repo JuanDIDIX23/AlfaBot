@@ -1,0 +1,59 @@
+digraph DFD1 {
+  bgcolor="#FAF7F1";
+  rankdir=TB;
+  nodesep=0.9;
+  ranksep=0.7;
+  compound=true;
+  node [fontname="Helvetica", fontsize=13];
+  edge [fontname="Helvetica", fontsize=11, color="#5B6560", fontcolor="#3C443F", arrowsize=0.8, penwidth=1.3];
+
+  usuario [shape=box, style="filled", fillcolor="#1E2A24", fontcolor="white", color="#1E2A24", margin="0.25,0.18",
+           label="Usuario"];
+
+  node [shape=box, style="rounded,filled", fillcolor="white", color="#3E7C72", penwidth=1.8, margin="0.2,0.14"];
+  p1 [label=<<b>P1</b><br/>Registrar usuario<br/>y abrir evaluación>];
+  p2 [label=<<b>P2</b><br/>Cargar hipótesis y<br/>probabilidades a priori>];
+  p3 [label=<<b>P3</b><br/>Seleccionar la<br/>siguiente pregunta>];
+  p4 [label=<<b>P4</b><br/>Consultar el gránulo<br/>de la respuesta>];
+  p5 [label=<<b>P5</b><br/>Actualizar probabilidades<br/>(teorema de Bayes)>];
+  p6 [label=<<b>P6</b><br/>Evaluar criterio<br/>de parada>];
+  p7 [label=<<b>P7</b><br/>Generar diagnóstico<br/>y plan de actividades>];
+
+  d1 [shape=none, margin=0, label=<<table border="0" cellborder="0" cellspacing="0" cellpadding="8">
+        <tr><td sides="TB" border="1" bgcolor="#E4EFEC" color="#3E7C72"><b>D1</b></td>
+            <td sides="TB" border="1" bgcolor="#E4EFEC" color="#3E7C72">Base de conocimiento</td></tr></table>>];
+  d2 [shape=none, margin=0, label=<<table border="0" cellborder="0" cellspacing="0" cellpadding="8">
+        <tr><td sides="TB" border="1" bgcolor="#FDEEE3" color="#C1652F"><b>D2</b></td>
+            <td sides="TB" border="1" bgcolor="#FDEEE3" color="#C1652F">Base transaccional</td></tr></table>>];
+
+  // Usuario <-> procesos
+  usuario -> p1 [label="alias"];
+  p3 -> usuario [label="pregunta con\nsus opciones", constraint=false];
+  usuario -> p4 [label="respuesta\nelegida"];
+  p7 -> usuario [label="diagnóstico\ny plan", constraint=false];
+
+  // Flujo principal
+  p1 -> p2 [label="evaluación\nabierta"];
+  p2 -> p3 [label="creencias\niniciales"];
+  p4 -> p5 [label="gránulo: regla y\npesos por hipótesis"];
+  p5 -> p6 [label="creencias\nactualizadas"];
+  p6 -> p3 [label="continuar", constraint=false, style=dashed];
+  p6 -> p7 [label="parar"];
+
+  // Base de conocimiento (verde)
+  d1 -> p2 [label="hipótesis y\nprior", color="#3E7C72", fontcolor="#3E7C72"];
+  d1 -> p3 [label="nodos pendientes y\nverosimilitudes", color="#3E7C72", fontcolor="#3E7C72"];
+  d1 -> p4 [label="regla y verosimilitudes\nde la rama", color="#3E7C72", fontcolor="#3E7C72"];
+
+  // Base transaccional (naranja)
+  p1 -> d2 [label="usuario y\nevaluación", color="#C1652F", fontcolor="#C1652F"];
+  p2 -> d2 [label="probabilidades\na priori", color="#C1652F", fontcolor="#C1652F"];
+  p5 -> d2 [label="respuesta e\ninferencia", color="#C1652F", fontcolor="#C1652F"];
+  p7 -> d2 [label="diagnóstico, plan\ny progreso", color="#C1652F", fontcolor="#C1652F"];
+
+  p3 -> p4 [style=invis];
+  {rank=same; usuario; p1;}
+  {rank=same; d1; p3;}
+  {rank=same; p4; }
+  {rank=same; p5; d2;}
+}

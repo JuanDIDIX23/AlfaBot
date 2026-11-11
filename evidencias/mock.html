@@ -1,0 +1,43 @@
+<html><head><meta charset="utf8"><style>
+:root{--ink:#1E2A24;--g:#3E7C72;--gl:#E4EFEC;--o:#C1652F;--ol:#FDEEE3;--bg:#FAF7F1}
+body{margin:0;background:#EFEAE0;padding:36px;font-family:Helvetica,Arial,sans-serif;color:var(--ink)}
+.row{display:flex;gap:36px;justify-content:center}
+.col{display:flex;flex-direction:column;align-items:center;gap:12px}
+.lbl{font-size:15px;color:#5B6560}
+.phone{width:330px;height:640px;background:var(--bg);border-radius:34px;border:9px solid #1E2A24;box-sizing:border-box;padding:26px 22px;display:flex;flex-direction:column;position:relative;overflow:hidden}
+h1{font-size:25px;margin:6px 0 4px}h2{font-size:19px;margin:6px 0 14px;line-height:1.3}
+p{font-size:14.5px;line-height:1.45;margin:0 0 12px;color:#3C443F}
+.btn{background:var(--g);color:#fff;border-radius:14px;padding:15px;text-align:center;font-weight:700;font-size:16px;margin-top:auto}
+.inp{border:2px solid #cfd8d3;background:#fff;border-radius:12px;padding:13px;font-size:15px;color:#8a948f;margin:6px 0 14px}
+.opt{border:2px solid #cfd8d3;background:#fff;border-radius:14px;padding:14px;font-size:15.5px;margin-bottom:11px}
+.opt.sel{border-color:var(--g);background:var(--gl);font-weight:700}
+.prog{height:7px;background:#dfe5e1;border-radius:4px;margin:4px 0 16px}.prog i{display:block;height:100%;width:40%;background:var(--g);border-radius:4px}
+.small{font-size:12.5px;color:#5B6560}
+.bar{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:13px}.bar span.n{width:118px}
+.bar .t{flex:1;height:12px;background:#dfe5e1;border-radius:6px;overflow:hidden}.bar .t i{display:block;height:100%;background:var(--g)}
+.bar b{width:42px;text-align:right}
+.card{background:var(--gl);border-radius:14px;padding:14px;margin-bottom:12px}
+.act{background:#fff;border-left:5px solid var(--o);border-radius:10px;padding:10px 12px;margin-bottom:9px;font-size:13.5px;line-height:1.4}
+.act em{font-style:normal;color:var(--o);font-weight:700;font-size:12px}
+.logo{width:64px;height:64px;border-radius:18px;background:var(--g);color:#fff;font-size:34px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:34px 0 18px}
+</style></head><body><div class="row">
+<div class="col"><div class="phone">
+ <div class="logo">A</div><h1>Hola, soy AlfaBot</h1>
+ <p>Te haré unas pocas preguntas para saber en qué punto estás y armar tu plan para leer y escribir mejor. No es un examen.</p>
+ <div class="small">¿Cómo te llamas?</div><div class="inp">Escribe tu nombre</div>
+ <div class="btn">Comenzar</div></div><div class="lbl">Pantalla 1. Inicio</div></div>
+<div class="col"><div class="phone">
+ <div class="small">Pregunta 2 de aprox. 5</div><div class="prog"><i></i></div>
+ <h2>¿Reconoce sílabas trabadas (bl, br, cl, pr, tr)?</h2>
+ <div class="opt">No reconoce sílabas trabadas</div><div class="opt sel">Confunde trabadas similares (bl/br)</div><div class="opt">Reconoce sílabas trabadas</div>
+ <div class="btn">Continuar</div></div><div class="lbl">Pantalla 2. Pregunta</div></div>
+<div class="col"><div class="phone">
+ <div class="small">Tu resultado</div><h2 style="margin-bottom:8px">Conciencia silábica</h2>
+ <div class="card"><div class="bar"><span class="n">Conciencia silábica</span><div class="t"><i style="width:96%"></i></div><b>96 %</b></div>
+ <div class="bar"><span class="n">Lectura de palabras</span><div class="t"><i style="width:2%;background:#9fb9b3"></i></div><b>2 %</b></div>
+ <div class="bar"><span class="n">Reconoc. de letras</span><div class="t"><i style="width:2%;background:#9fb9b3"></i></div><b>2 %</b></div></div>
+ <div class="small" style="margin-bottom:6px">Tu plan de actividades</div>
+ <div class="act"><em>R16</em><br>Practicar sílabas mixtas con apoyo de imágenes y palabras cotidianas</div>
+ <div class="act"><em>R19</em><br>Ejercicios de discriminación auditiva: bl / br</div>
+ <div class="btn">Ver mi progreso</div></div><div class="lbl">Pantalla 3. Resultado y plan</div></div>
+</div></body></html>

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AlfaBot — Diagnóstico de lectura y escritura</title>
+  <meta name="description" content="Sistema experto que identifica tu nivel de lectura y escritura y arma un plan de actividades.">
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <header class="cabecera">
+    <div class="marca"><span class="logo" aria-hidden="true">A</span><span class="nombre">AlfaBot</span></div>
+  </header>
+
+  <main class="contenedor">
+    <p id="aviso" class="aviso" role="alert" hidden></p>
+
+    <section id="inicio" class="pantalla" aria-labelledby="titulo-inicio">
+      <div class="con-voz">
+        <h1 id="titulo-inicio" tabindex="-1">Hola, soy AlfaBot</h1>
+        <button type="button" class="voz" data-leer="inicio" aria-label="Escuchar la presentación" hidden>🔊</button>
+      </div>
+      <p class="intro" id="intro-inicio">Te haré unas pocas preguntas para saber en qué punto estás con la lectura y la escritura, y armar un plan de actividades para ti. No es un examen.</p>
+
+      <div id="pendiente" class="tarjeta" hidden>
+        <div class="con-voz">
+          <p id="texto-pendiente">Tienes una evaluación sin terminar.</p>
+          <button type="button" class="voz" data-leer="pendiente" aria-label="Escuchar el aviso" hidden>🔊</button>
+        </div>
+        <div class="acciones">
+          <button type="button" id="continuar" class="boton">Continuar donde iba</button>
+          <button type="button" id="descartar" class="boton secundario">Empezar de nuevo</button>
+        </div>
+      </div>
+
+      <form id="formulario" novalidate>
+        <div class="con-voz">
+          <label for="alias">¿Cómo te llamas?</label>
+          <button type="button" class="voz" data-leer="alias" aria-label="Escuchar la pregunta del nombre" hidden>🔊</button>
+        </div>
+        <input id="alias" name="alias" type="text" maxlength="60" autocomplete="given-name" required>
+        <button type="submit" class="boton" id="comenzar">Comenzar</button>
+      </form>
+    </section>
+
+    <section id="pregunta" class="pantalla" aria-labelledby="enunciado" hidden>
+      <p class="contador" id="contador"></p>
+      <div class="con-voz">
+        <h1 id="enunciado" tabindex="-1"></h1>
+        <button type="button" class="voz" data-leer="pregunta" aria-label="Escuchar la pregunta y sus opciones" hidden>🔊</button>
+      </div>
+      <p id="regla" class="regla" hidden></p>
+      <div id="opciones" class="opciones" role="group" aria-labelledby="enunciado"></div>
+
+      <details class="panel" open>
+        <summary>Lo que AlfaBot piensa hasta ahora</summary>
+        <p class="nota">Cada barra es la probabilidad de que estés en ese nivel. Cambia con cada respuesta.</p>
+        <div id="barras-pregunta" class="barras"></div>
+      </details>
+    </section>
+
+    <section id="resultado" class="pantalla" aria-labelledby="titulo-resultado" hidden>
+      <p class="contador">Tu resultado</p>
+      <div class="con-voz">
+        <h1 id="titulo-resultado" tabindex="-1"></h1>
+        <button type="button" class="voz" data-leer="resultado" aria-label="Escuchar tu resultado" hidden>🔊</button>
+      </div>
+      <p id="descripcion" class="intro"></p>
+      <p id="confianza" class="confianza"></p>
+
+      <h2>Probabilidad de cada nivel</h2>
+      <div id="barras-resultado" class="barras"></div>
+
+      <div class="con-voz">
+        <h2>Tu plan de actividades</h2>
+        <button type="button" class="voz" data-leer="plan" aria-label="Escuchar todo el plan de actividades" hidden>🔊</button>
+      </div>
+      <ol id="plan" class="plan"></ol>
+      <p id="sin-plan" class="nota" hidden>No encontré dificultades que necesiten actividades de refuerzo.</p>
+
+      <button type="button" id="reiniciar" class="boton">Hacer otra evaluación</button>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <span id="estado-servicio" class="estado">Revisando el servicio…</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

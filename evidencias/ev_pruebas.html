@@ -1,0 +1,136 @@
+<html><head><meta charset='utf8'><style>
+body{margin:0;background:#FAF7F1;padding:24px;font-family:Helvetica,Arial,sans-serif}
+.win{width:1080px;border-radius:10px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.25);background:#272822}
+.bar{background:#3a3b36;color:#d8d8d0;font:13px 'DejaVu Sans Mono',monospace;padding:9px 14px;display:flex;align-items:center;gap:8px}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+pre{margin:0;padding:14px 16px;font:14px/1.45 'DejaVu Sans Mono',monospace;color:#f8f8f2;white-space:pre}
+.ln{color:#75715e;display:inline-block;width:42px;text-align:right;margin-right:16px;user-select:none}
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.hl .hll { background-color: #49483e }
+.hl { background: #272822; color: #F8F8F2 }
+.hl .c { color: #959077 } /* Comment */
+.hl .err { color: #ED007E; background-color: #1E0010 } /* Error */
+.hl .esc { color: #F8F8F2 } /* Escape */
+.hl .g { color: #F8F8F2 } /* Generic */
+.hl .k { color: #66D9EF } /* Keyword */
+.hl .l { color: #AE81FF } /* Literal */
+.hl .n { color: #F8F8F2 } /* Name */
+.hl .o { color: #FF4689 } /* Operator */
+.hl .x { color: #F8F8F2 } /* Other */
+.hl .p { color: #F8F8F2 } /* Punctuation */
+.hl .ch { color: #959077 } /* Comment.Hashbang */
+.hl .cm { color: #959077 } /* Comment.Multiline */
+.hl .cp { color: #959077 } /* Comment.Preproc */
+.hl .cpf { color: #959077 } /* Comment.PreprocFile */
+.hl .c1 { color: #959077 } /* Comment.Single */
+.hl .cs { color: #959077 } /* Comment.Special */
+.hl .gd { color: #FF4689 } /* Generic.Deleted */
+.hl .ge { color: #F8F8F2; font-style: italic } /* Generic.Emph */
+.hl .ges { color: #F8F8F2; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.hl .gr { color: #FF4689 } /* Generic.Error */
+.hl .gh { color: #F8F8F2 } /* Generic.Heading */
+.hl .gi { color: #A6E22E } /* Generic.Inserted */
+.hl .go { color: #66D9EF } /* Generic.Output */
+.hl .gp { color: #FF4689; font-weight: bold } /* Generic.Prompt */
+.hl .gs { color: #F8F8F2; font-weight: bold } /* Generic.Strong */
+.hl .gu { color: #959077 } /* Generic.Subheading */
+.hl .gt { color: #66D9EF } /* Generic.Traceback */
+.hl .kc { color: #66D9EF } /* Keyword.Constant */
+.hl .kd { color: #66D9EF } /* Keyword.Declaration */
+.hl .kn { color: #FF4689 } /* Keyword.Namespace */
+.hl .kp { color: #66D9EF } /* Keyword.Pseudo */
+.hl .kr { color: #66D9EF } /* Keyword.Reserved */
+.hl .kt { color: #66D9EF } /* Keyword.Type */
+.hl .ld { color: #E6DB74 } /* Literal.Date */
+.hl .m { color: #AE81FF } /* Literal.Number */
+.hl .s { color: #E6DB74 } /* Literal.String */
+.hl .na { color: #A6E22E } /* Name.Attribute */
+.hl .nb { color: #A6E22E } /* Name.Builtin */
+.hl .nc { color: #A6E22E } /* Name.Class */
+.hl .no { color: #66D9EF } /* Name.Constant */
+.hl .nd { color: #A6E22E } /* Name.Decorator */
+.hl .ni { color: #F8F8F2 } /* Name.Entity */
+.hl .ne { color: #A6E22E } /* Name.Exception */
+.hl .nf { color: #A6E22E } /* Name.Function */
+.hl .nl { color: #F8F8F2 } /* Name.Label */
+.hl .nn { color: #F8F8F2 } /* Name.Namespace */
+.hl .nx { color: #A6E22E } /* Name.Other */
+.hl .py { color: #F8F8F2 } /* Name.Property */
+.hl .nt { color: #FF4689 } /* Name.Tag */
+.hl .nv { color: #F8F8F2 } /* Name.Variable */
+.hl .ow { color: #FF4689 } /* Operator.Word */
+.hl .pm { color: #F8F8F2 } /* Punctuation.Marker */
+.hl .w { color: #F8F8F2 } /* Text.Whitespace */
+.hl .mb { color: #AE81FF } /* Literal.Number.Bin */
+.hl .mf { color: #AE81FF } /* Literal.Number.Float */
+.hl .mh { color: #AE81FF } /* Literal.Number.Hex */
+.hl .mi { color: #AE81FF } /* Literal.Number.Integer */
+.hl .mo { color: #AE81FF } /* Literal.Number.Oct */
+.hl .sa { color: #E6DB74 } /* Literal.String.Affix */
+.hl .sb { color: #E6DB74 } /* Literal.String.Backtick */
+.hl .sc { color: #E6DB74 } /* Literal.String.Char */
+.hl .dl { color: #E6DB74 } /* Literal.String.Delimiter */
+.hl .sd { color: #E6DB74 } /* Literal.String.Doc */
+.hl .s2 { color: #E6DB74 } /* Literal.String.Double */
+.hl .se { color: #AE81FF } /* Literal.String.Escape */
+.hl .sh { color: #E6DB74 } /* Literal.String.Heredoc */
+.hl .si { color: #E6DB74 } /* Literal.String.Interpol */
+.hl .sx { color: #E6DB74 } /* Literal.String.Other */
+.hl .sr { color: #E6DB74 } /* Literal.String.Regex */
+.hl .s1 { color: #E6DB74 } /* Literal.String.Single */
+.hl .ss { color: #E6DB74 } /* Literal.String.Symbol */
+.hl .bp { color: #A6E22E } /* Name.Builtin.Pseudo */
+.hl .fm { color: #A6E22E } /* Name.Function.Magic */
+.hl .vc { color: #F8F8F2 } /* Name.Variable.Class */
+.hl .vg { color: #F8F8F2 } /* Name.Variable.Global */
+.hl .vi { color: #F8F8F2 } /* Name.Variable.Instance */
+.hl .vm { color: #F8F8F2 } /* Name.Variable.Magic */
+.hl .il { color: #AE81FF } /* Literal.Number.Integer.Long */
+.term{background:#1b1f1d} .term pre{color:#d8e4dc} .term .bar{background:#2c332f}
+</style></head><body><div class='win term'><div class='bar'><span class='dot' style='background:#ff5f56'></span><span class='dot' style='background:#ffbd2e'></span><span class='dot' style='background:#27c93f'></span><span style='margin-left:10px'>npm run pruebas</span></div><pre class='hl'>
+== Pruebas del motor ==
+  <span style='color:#6fd08c'>OK</span>   Bayes: el posterior suma 1
+  <span style='color:#6fd08c'>OK</span>   Bayes: la hipótesis con mayor verosimilitud sube
+  <span style='color:#6fd08c'>OK</span>   Bayes: el orden de las respuestas no altera el resultado
+  <span style='color:#6fd08c'>OK</span>   Ganancia: una pregunta que no distingue hipótesis aporta 0 bits
+  <span style='color:#6fd08c'>OK</span>   Ganancia: una pregunta que separa las hipótesis aporta bits positivos
+
+== Escenarios con usuarios simulados ==
+
+  Falla al inicio de su módulo
+    <span style='color:#6fd08c'>OK</span>   Nivel 1, falla al inicio           esperada H1  obtenida H1  (99.7 %, 5 preguntas)
+    <span style='color:#6fd08c'>OK</span>   Nivel 2, falla al inicio           esperada H2  obtenida H2  (94.7 %, 5 preguntas)
+    <span style='color:#6fd08c'>OK</span>   Nivel 3, falla al inicio           esperada H3  obtenida H3  (93.1 %, 5 preguntas)
+    <span style='color:#6fd08c'>OK</span>   Nivel 4, falla al inicio           esperada H4  obtenida H4  (96.4 %, 5 preguntas)
+    <span style='color:#6fd08c'>OK</span>   Nivel 5, falla al inicio           esperada H5  obtenida H5  (99.8 %, 5 preguntas)
+
+  Falla solo en el último nodo de su módulo
+    <span style='color:#6fd08c'>OK</span>   Nivel 1, falla en el último nodo   esperada H1  obtenida H1  (85.1 %, 8 preguntas, sin alcanzar umbral)
+    <span style='color:#6fd08c'>OK</span>   Nivel 2, falla en el último nodo   esperada H2  obtenida H2  (61.9 %, 10 preguntas, sin alcanzar umbral)
+    <span style='color:#6fd08c'>OK</span>   Nivel 3, falla en el último nodo   esperada H3  obtenida H3  (89.5 %, 10 preguntas, sin alcanzar umbral)
+    <span style='color:#ff8a65'>FALLA</span>  Nivel 4, falla en el último nodo   esperada H4  obtenida H5  (80.2 %, 6 preguntas, sin alcanzar umbral)
+
+  Un desliz aislado del usuario
+    <span style='color:#6fd08c'>OK</span>   Nivel 2, desliz en la pregunta 2   esperada H2  obtenida H2  (91.9 %, 6 preguntas)
+    <span style='color:#ff8a65'>FALLA</span>  Nivel 2, desliz en la pregunta 3   esperada H2  obtenida H1  (85.1 %, 8 preguntas, sin alcanzar umbral)
+    <span style='color:#ff8a65'>FALLA</span>  Nivel 3, desliz en la pregunta 2   esperada H3  obtenida H2  (61.9 %, 10 preguntas, sin alcanzar umbral)
+    <span style='color:#6fd08c'>OK</span>   Nivel 3, desliz en la pregunta 3   esperada H3  obtenida H3  (55.3 %, 9 preguntas, sin alcanzar umbral)
+    <span style='color:#6fd08c'>OK</span>   Nivel 4, desliz en la pregunta 2   esperada H4  obtenida H4  (93.1 %, 6 preguntas)
+    <span style='color:#ff8a65'>FALLA</span>  Nivel 4, desliz en la pregunta 3   esperada H4  obtenida H3  (76.6 %, 10 preguntas, sin alcanzar umbral)
+
+== Traza de una evaluación (usuario de nivel 2) ==
+  paso 0 -   -    H1=20.0%  H2=20.0%  H3=20.0%  H4=20.0%  H5=20.0%
+  paso 1 C3  R28  H1=23.8%  H2=23.8%  H3=44.5%  H4=4.0%  H5=4.0%
+  paso 2 B4  R19  H1=30.8%  H2=57.8%  H3=9.6%  H4=0.9%  H5=0.9%
+  paso 3 A3  R10  H1=4.6%  H2=79.7%  H3=13.3%  H4=1.2%  H5=1.2%
+  paso 4 B3  R16  H1=6.3%  H2=92.0%  H3=1.5%  H4=0.1%  H5=0.1%
+  paso 5 A2  R8   H1=1.6%  H2=96.5%  H3=1.6%  H4=0.1%  H5=0.1%
+
+== Persistencia en la base transaccional ==
+  <span style='color:#6fd08c'>OK</span>   {&quot;respuestas&quot;:5,&quot;inferencias&quot;:30,&quot;diagnosticos&quot;:2,&quot;progreso&quot;:4,&quot;estado&quot;:&quot;completada&quot;} (inferencias esperadas: 30)
+
+Resumen: 5/5 pruebas del motor, 11/15 escenarios con diagnóstico correcto.</pre></div></body></html>

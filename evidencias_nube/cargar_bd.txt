@@ -1,0 +1,4 @@
+Base de conocimiento cargada:
+  4 módulos, 14 nodos (preguntas), 40 ramas (respuestas), 40 reglas SI-ENTONCES
+  5 hipótesis, 200 verosimilitudes
+  Rol de aplicación alfabot_app creado con permisos mínimos

@@ -1,0 +1,160 @@
+¿Cómo te llamas? María
+
+=== AlfaBot: diagnóstico de lectoescritura ===
+Responde cada pregunta con el número de la opción que mejor te describa.
+
+Probabilidades iniciales:
+  H1 Reconocimiento de letras              ██████░░░░░░░░░░░░░░░░░░░░░░░░  20.0 %
+  H2 Conciencia silábica                   ██████░░░░░░░░░░░░░░░░░░░░░░░░  20.0 %
+  H3 Lectura de palabras y oraciones       ██████░░░░░░░░░░░░░░░░░░░░░░░░  20.0 %
+  H4 Comprensión y escritura               ██████░░░░░░░░░░░░░░░░░░░░░░░░  20.0 %
+  H5 Alfabetización básica lograda         ██████░░░░░░░░░░░░░░░░░░░░░░░░  20.0 %
+
+Pregunta 1 (módulo C): ¿Lee oraciones simples?
+  1. No logra unir palabras en una oración
+  2. Lee oraciones con pausas excesivas
+  3. Lee oraciones con fluidez
+Tu respuesta: 2
+Probabilidades tras la respuesta 1 (regla R28):
+  H1 Reconocimiento de letras              ███████░░░░░░░░░░░░░░░░░░░░░░░  23.8 %
+  H2 Conciencia silábica                   ███████░░░░░░░░░░░░░░░░░░░░░░░  23.8 %
+  H3 Lectura de palabras y oraciones       █████████████░░░░░░░░░░░░░░░░░  44.6 %
+  H4 Comprensión y escritura               █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   4.0 %
+  H5 Alfabetización básica lograda         █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   4.0 %
+
+Pregunta 2 (módulo B): ¿Reconoce sílabas trabadas (bl, br, cl, pr, tr)?
+  1. No reconoce sílabas trabadas
+  2. Confunde trabadas similares (bl/br)
+  3. Reconoce sílabas trabadas
+Tu respuesta: 2
+Probabilidades tras la respuesta 2 (regla R19):
+  H1 Reconocimiento de letras              █████████░░░░░░░░░░░░░░░░░░░░░  30.8 %
+  H2 Conciencia silábica                   █████████████████░░░░░░░░░░░░░  57.8 %
+  H3 Lectura de palabras y oraciones       ███░░░░░░░░░░░░░░░░░░░░░░░░░░░   9.6 %
+  H4 Comprensión y escritura               ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.9 %
+  H5 Alfabetización básica lograda         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.9 %
+
+Pregunta 3 (módulo A): ¿Diferencia mayúsculas de minúsculas?
+  1. No diferencia mayúsculas de minúsculas
+  2. Diferencia mayúsculas de minúsculas
+Tu respuesta: 2
+Probabilidades tras la respuesta 3 (regla R10):
+  H1 Reconocimiento de letras              █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   4.6 %
+  H2 Conciencia silábica                   ████████████████████████░░░░░░  79.7 %
+  H3 Lectura de palabras y oraciones       ████░░░░░░░░░░░░░░░░░░░░░░░░░░  13.3 %
+  H4 Comprensión y escritura               ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   1.2 %
+  H5 Alfabetización básica lograda         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   1.2 %
+
+Pregunta 4 (módulo B): ¿Reconoce sílabas mixtas (consonante-vocal-consonante: pan, sol)?
+  1. No reconoce sílabas mixtas
+  2. Reconoce sílabas mixtas
+Tu respuesta: 2
+Probabilidades tras la respuesta 4 (regla R17):
+  H1 Reconocimiento de letras              ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.6 %
+  H2 Conciencia silábica                   ███████████████░░░░░░░░░░░░░░░  50.1 %
+  H3 Lectura de palabras y oraciones       █████████████░░░░░░░░░░░░░░░░░  41.9 %
+  H4 Comprensión y escritura               █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   3.7 %
+  H5 Alfabetización básica lograda         █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   3.7 %
+
+Pregunta 5 (módulo B): ¿Reconoce sílabas inversas (vocal+consonante: al, es, un)?
+  1. No reconoce sílabas inversas
+  2. Reconoce sílabas inversas
+Tu respuesta: 2
+Probabilidades tras la respuesta 5 (regla R15):
+  H1 Reconocimiento de letras              ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.0 %
+  H2 Conciencia silábica                   ███████░░░░░░░░░░░░░░░░░░░░░░░  22.7 %
+  H3 Lectura de palabras y oraciones       ████████████████████░░░░░░░░░░  65.6 %
+  H4 Comprensión y escritura               ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░   5.8 %
+  H5 Alfabetización básica lograda         ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░   5.8 %
+
+Pregunta 6 (módulo C): ¿Lee palabras largas (4 o más sílabas)?
+  1. No logra leer palabras largas
+  2. Lee palabras largas con dificultad
+  3. Lee palabras largas correctamente
+Tu respuesta: 2
+Probabilidades tras la respuesta 6 (regla R25):
+  H1 Reconocimiento de letras              ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.0 %
+  H2 Conciencia silábica                   █████░░░░░░░░░░░░░░░░░░░░░░░░░  17.4 %
+  H3 Lectura de palabras y oraciones       ████████████████████████░░░░░░  81.1 %
+  H4 Comprensión y escritura               ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.7 %
+  H5 Alfabetización básica lograda         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.7 %
+
+Pregunta 7 (módulo B): ¿Reconoce sílabas directas (consonante+vocal: ma, pe, si)?
+  1. No reconoce sílabas directas
+  2. Reconoce solo sílabas con consonantes muy frecuentes
+  3. Reconoce sílabas directas en general
+Tu respuesta: 2
+Probabilidades tras la respuesta 7 (regla R12):
+  H1 Reconocimiento de letras              ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.1 %
+  H2 Conciencia silábica                   ███████████████████░░░░░░░░░░░  63.1 %
+  H3 Lectura de palabras y oraciones       ███████████░░░░░░░░░░░░░░░░░░░  36.2 %
+  H4 Comprensión y escritura               ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.3 %
+  H5 Alfabetización básica lograda         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.3 %
+
+Pregunta 8 (módulo C): ¿Lee palabras cortas (2-3 sílabas) con fluidez?
+  1. Decodifica letra por letra sin unir la palabra
+  2. Lee lento y sin fluidez
+  3. Lee palabras cortas con fluidez
+Tu respuesta: 2
+Probabilidades tras la respuesta 8 (regla R22):
+  H1 Reconocimiento de letras              ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.1 %
+  H2 Conciencia silábica                   █████████████████░░░░░░░░░░░░░  56.2 %
+  H3 Lectura de palabras y oraciones       █████████████░░░░░░░░░░░░░░░░░  43.6 %
+  H4 Comprensión y escritura               ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.0 %
+  H5 Alfabetización básica lograda         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.0 %
+
+Pregunta 9 (módulo D): ¿Comprende lo que lee (comprensión literal)?
+  1. No comprende aunque decodifica correctamente
+  2. Comprende parcialmente el texto
+  3. Comprende el texto correctamente
+Tu respuesta: 2
+Probabilidades tras la respuesta 9 (regla R31):
+  H1 Reconocimiento de letras              ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.1 %
+  H2 Conciencia silábica                   █████████████████░░░░░░░░░░░░░  56.2 %
+  H3 Lectura de palabras y oraciones       █████████████░░░░░░░░░░░░░░░░░  43.6 %
+  H4 Comprensión y escritura               ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.1 %
+  H5 Alfabetización básica lograda         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.0 %
+
+Pregunta 10 (módulo A): ¿Reconoce consonantes de alta frecuencia (m, p, s, l, t)?
+  1. No reconoce ninguna consonante frecuente
+  2. Confunde b con d
+  3. Confunde p con q
+  4. Confunde m con n
+  5. Reconoce correctamente las consonantes frecuentes
+Tu respuesta: 2
+Probabilidades tras la respuesta 10 (regla R5):
+  H1 Reconocimiento de letras              ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.8 %
+  H2 Conciencia silábica                   █████████████████░░░░░░░░░░░░░  55.8 %
+  H3 Lectura de palabras y oraciones       █████████████░░░░░░░░░░░░░░░░░  43.3 %
+  H4 Comprensión y escritura               ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.1 %
+  H5 Alfabetización básica lograda         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.0 %
+
+Pregunta 11 (módulo A): ¿Reconoce las vocales (a, e, i, o, u)?
+  1. No reconoce ninguna vocal
+  2. Reconoce entre 1 y 3 vocales
+  3. Reconoce las 5 vocales
+Tu respuesta: 2
+Probabilidades tras la respuesta 11 (regla R2):
+  H1 Reconocimiento de letras              ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░   5.8 %
+  H2 Conciencia silábica                   ████████████████░░░░░░░░░░░░░░  53.0 %
+  H3 Lectura de palabras y oraciones       ████████████░░░░░░░░░░░░░░░░░░  41.1 %
+  H4 Comprensión y escritura               ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.1 %
+  H5 Alfabetización básica lograda         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.0 %
+
+=== Resultado ===
+Probabilidad final de cada hipótesis:
+  H2 Conciencia silábica                   ████████████████░░░░░░░░░░░░░░  53.0 %
+  H3 Lectura de palabras y oraciones       ████████████░░░░░░░░░░░░░░░░░░  41.1 %
+  H1 Reconocimiento de letras              ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░   5.8 %
+  H4 Comprensión y escritura               ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.1 %
+  H5 Alfabetización básica lograda         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.0 %
+
+Diagnóstico: H2 - Conciencia silábica (53.0 %)
+El usuario reconoce las letras pero todavía no forma sílabas directas, inversas, mixtas o trabadas.
+Se agotaron las preguntas útiles (11); la confianza es moderada.
+
+Plan de actividades recomendado:
+  1. [R2] Reconoce entre 1 y 3 vocales: reforzar las vocales faltantes mediante repetición y trazo guiado
+  2. [R5] Confunde b con d: aplicar ejercicios de discriminación visual orientados a la orientación espacial de las letras
+  3. [R12] Reconoce solo sílabas con consonantes muy frecuentes: reforzar sílabas con consonantes de menor frecuencia (f, r, g, j)
+  4. [R19] Confunde trabadas similares (bl/br): aplicar ejercicios de discriminación auditiva específicos
