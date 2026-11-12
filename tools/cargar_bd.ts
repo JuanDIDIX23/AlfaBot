@@ -11,14 +11,14 @@ import { Conexion } from "../src/datos/Conexion";
  * Uso:
  *   npm run cargar-bd                 crea las tablas y carga las reglas y las lecciones.
  *                                     Si la base ya existe pero le falta una parte (módulo de
- *                                     aprendizaje o historial), agrega solo lo que falta, sin
- *                                     tocar los datos.
+ *                                     aprendizaje, historial o cuentas), agrega solo lo que
+ *                                     falta, sin tocar los datos.
  *   npm run cargar-bd -- --reiniciar  borra las tablas de AlfaBot y vuelve a cargar todo
  *
  * Si se define ALFABOT_APP_PASSWORD, además crea el rol de aplicación `alfabot_app` (permisos mínimos).
  */
 const TABLAS = [
-  "intentos_ejercicio", "ruta_lecciones", "rutas", "lecciones_reglas", "lecciones",
+  "sesiones", "intentos_ejercicio", "ruta_lecciones", "rutas", "lecciones_reglas", "lecciones",
   "diagnosticos", "inferencias", "respuestas", "progreso", "evaluaciones", "usuarios",
   "verosimilitudes", "hipotesis", "reglas", "ramas", "nodos", "modulos",
 ];
@@ -37,10 +37,11 @@ async function main(): Promise<void> {
       `SELECT to_regclass('public.hipotesis') IS NOT NULL AS diagnostico,
               to_regclass('public.lecciones') IS NOT NULL AS aprendizaje,
               EXISTS (SELECT 1 FROM information_schema.columns
-                       WHERE table_schema = 'public' AND table_name = 'usuarios' AND column_name = 'clave') AS historial`,
+                       WHERE table_schema = 'public' AND table_name = 'usuarios' AND column_name = 'clave') AS historial,
+              to_regclass('public.sesiones') IS NOT NULL AS cuentas`,
     );
-    const { diagnostico, aprendizaje, historial } = existe.rows[0];
-    if (diagnostico && aprendizaje && historial && !reiniciar) {
+    const { diagnostico, aprendizaje, historial, cuentas } = existe.rows[0];
+    if (diagnostico && aprendizaje && historial && cuentas && !reiniciar) {
       throw new Error("Las tablas de AlfaBot ya existen. Usa --reiniciar si quieres borrarlas y cargar de nuevo.");
     }
 
@@ -54,6 +55,7 @@ async function main(): Promise<void> {
     }
     if (!aprendizaje || reiniciar) await cliente.query(leer("04_aprendizaje.sql"));
     await cliente.query(leer("05_historial.sql")); // idempotente
+    await cliente.query(leer("06_cuentas.sql")); // idempotente
 
     if (clave !== undefined) {
       const rol = await cliente.query(`SELECT 1 FROM pg_roles WHERE rolname = 'alfabot_app'`);

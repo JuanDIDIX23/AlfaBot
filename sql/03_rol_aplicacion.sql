@@ -17,3 +17,6 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO alfabot_app;
 -- Módulo de aprendizaje (04_aprendizaje.sql)
 GRANT SELECT ON lecciones, lecciones_reglas TO alfabot_app;
 GRANT SELECT, INSERT, UPDATE ON rutas, ruta_lecciones, intentos_ejercicio TO alfabot_app;
+
+-- Cuentas e inicio de sesión (06_cuentas.sql)
+GRANT SELECT, INSERT, UPDATE ON sesiones TO alfabot_app;

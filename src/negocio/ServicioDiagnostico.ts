@@ -47,8 +47,8 @@ export class ServicioDiagnostico {
     return this.abrirEvaluacion(await this.identificarUsuario(alias, clave));
   }
 
-  /** Abre una evaluación nueva para un usuario ya identificado (P1 y P2). */
-  async abrirEvaluacion(usuario: UsuarioIdentificado): Promise<SesionDiagnostico> {
+  /** Abre una evaluación nueva para un usuario ya identificado o con sesión iniciada (P1 y P2). */
+  async abrirEvaluacion(usuario: { id: number }): Promise<SesionDiagnostico> {
     const usuarioId = usuario.id;
     const evaluacionId = await this.evaluaciones.crearEvaluacion(usuarioId);
 
@@ -68,9 +68,8 @@ export class ServicioDiagnostico {
   }
 
   /** Historial de un usuario (P8): sus evaluaciones con el nivel de cada una y su progreso por módulo. */
-  async historial(clave: string): Promise<HistorialUsuario | null> {
-    const usuario = await this.evaluaciones.usuarioPorClave(clave);
-    return usuario === null ? null : this.evaluaciones.historialDeUsuario(usuario.id);
+  historial(usuarioId: number): Promise<HistorialUsuario> {
+    return this.evaluaciones.historialDeUsuario(usuarioId);
   }
 
   /**

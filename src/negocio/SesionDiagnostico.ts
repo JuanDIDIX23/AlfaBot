@@ -33,7 +33,8 @@ export class SesionDiagnostico {
   private preguntaActual: Pregunta | null = null;
 
   constructor(
-    private readonly usuarioId: number,
+    /** Dueño de la evaluación: la API solo deja verla y responderla a este usuario. */
+    public readonly usuarioId: number,
     public readonly evaluacionId: number,
     creencias: Creencia[],
     private readonly dep: DependenciasSesion,

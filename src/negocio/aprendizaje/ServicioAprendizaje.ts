@@ -67,9 +67,11 @@ export class ServicioAprendizaje {
   }
 
   /** Crea la ruta de una evaluación terminada. La clave que devuelve es la única forma de volver a ella. */
-  async crearRuta(evaluacionId: number): Promise<{ clave: string; ruta: Ruta }> {
+  async crearRuta(evaluacionId: number, usuarioId: number): Promise<{ clave: string; ruta: Ruta }> {
     const diagnostico = await this.repo.diagnosticoParaRuta(evaluacionId);
-    if (diagnostico === null) throw new ErrorAprendizaje("no_existe", "No existe esa evaluación");
+    if (diagnostico === null || diagnostico.usuarioId !== usuarioId) {
+      throw new ErrorAprendizaje("no_existe", "No existe esa evaluación");
+    }
     if (!diagnostico.completada) throw new ErrorAprendizaje("no_terminada", "Primero termina la evaluación");
 
     const pasos = this.constructorRuta.construir(await this.lecciones(), diagnostico);
@@ -87,22 +89,25 @@ export class ServicioAprendizaje {
     return evaluacionIds.length === 0 ? Promise.resolve(new Map()) : this.repo.rutasDeEvaluaciones(evaluacionIds);
   }
 
-  async ruta(clave: string): Promise<Ruta> {
+  /** La ruta de esa clave, solo si es de este usuario. */
+  async ruta(clave: string, usuarioId: number): Promise<Ruta> {
     const ruta = await this.repo.rutaPorClave(clave);
-    if (ruta === null) throw new ErrorAprendizaje("no_existe", "No encontré tu plan de aprendizaje");
+    if (ruta === null || ruta.usuarioId !== usuarioId) {
+      throw new ErrorAprendizaje("no_existe", "No encontré tu plan de aprendizaje");
+    }
     return ruta;
   }
 
   /** Arma una ronda nueva de ejercicios para una lección disponible o ya superada (repaso). */
-  async nuevaRonda(clave: string, rutaLeccionId: number): Promise<{ leccion: LeccionEnRuta; ejercicios: Ejercicio[] }> {
-    const { leccion } = await this.leccionDeRuta(clave, rutaLeccionId);
+  async nuevaRonda(clave: string, usuarioId: number, rutaLeccionId: number): Promise<{ leccion: LeccionEnRuta; ejercicios: Ejercicio[] }> {
+    const { leccion } = await this.leccionDeRuta(clave, usuarioId, rutaLeccionId);
     const historial = await this.repo.intentosRecientes(leccion.id, HISTORIAL_ADAPTATIVO);
     return { leccion, ejercicios: this.generador.generarRonda(leccion.leccion, historial) };
   }
 
   /** Califica una ronda: con 80 % de aciertos o más la lección queda superada y se abre la siguiente. */
-  async terminarRonda(clave: string, rutaLeccionId: number, resultados: ResultadoEjercicio[]): Promise<ResumenRonda> {
-    const { ruta, leccion } = await this.leccionDeRuta(clave, rutaLeccionId);
+  async terminarRonda(clave: string, usuarioId: number, rutaLeccionId: number, resultados: ResultadoEjercicio[]): Promise<ResumenRonda> {
+    const { ruta, leccion } = await this.leccionDeRuta(clave, usuarioId, rutaLeccionId);
     if (resultados.length === 0 || resultados.length > EJERCICIOS_POR_RONDA) {
       throw new ErrorAprendizaje("invalido", "Los resultados de la ronda no son válidos");
     }
@@ -116,7 +121,7 @@ export class ServicioAprendizaje {
     const superada = resultados.length === EJERCICIOS_POR_RONDA && aciertos / resultados.length >= UMBRAL_SUPERACION;
     await this.repo.registrarRonda(ruta, leccion, resultados, superada);
 
-    const despues = await this.ruta(clave);
+    const despues = await this.ruta(clave, usuarioId);
     const antes = new Map(ruta.lecciones.map((l) => [l.id, l.estado]));
     const siguiente = despues.lecciones.find((l) => l.estado === "disponible" && antes.get(l.id) === "bloqueada") ?? null;
     return {
@@ -129,8 +134,8 @@ export class ServicioAprendizaje {
     };
   }
 
-  private async leccionDeRuta(clave: string, rutaLeccionId: number): Promise<{ ruta: Ruta; leccion: LeccionEnRuta }> {
-    const ruta = await this.ruta(clave);
+  private async leccionDeRuta(clave: string, usuarioId: number, rutaLeccionId: number): Promise<{ ruta: Ruta; leccion: LeccionEnRuta }> {
+    const ruta = await this.ruta(clave, usuarioId);
     const leccion = ruta.lecciones.find((l) => l.id === rutaLeccionId);
     if (!leccion) throw new ErrorAprendizaje("no_existe", "Esa lección no está en tu plan");
     if (leccion.estado === "bloqueada") {

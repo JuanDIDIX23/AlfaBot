@@ -15,23 +15,62 @@
   <main class="contenedor">
     <p id="aviso" class="aviso" role="alert" hidden></p>
 
-    <section id="inicio" class="pantalla" aria-labelledby="titulo-inicio">
+    <section id="acceso" class="pantalla" aria-labelledby="titulo-acceso" hidden>
       <div class="con-voz">
-        <h1 id="titulo-inicio" tabindex="-1">Hola, soy AlfaBot</h1>
+        <h1 id="titulo-acceso" tabindex="-1">Hola, soy AlfaBot</h1>
+        <button type="button" class="voz" data-leer="acceso" aria-label="Escuchar la bienvenida" hidden>🔊</button>
+      </div>
+      <p class="intro" id="intro-acceso">Te ayudo a leer y escribir mejor. Entra con tu usuario y tu PIN para guardar tu avance y seguir cuando quieras, en cualquier celular o computador.</p>
+
+      <div class="pestanas" role="tablist" aria-label="Entrar o crear cuenta">
+        <button type="button" role="tab" id="tab-entrar" class="pestana" aria-selected="true" aria-controls="form-entrar">Ya tengo cuenta</button>
+        <button type="button" role="tab" id="tab-crear" class="pestana" aria-selected="false" aria-controls="form-crear">Soy nuevo</button>
+      </div>
+
+      <form id="form-entrar" class="formulario-cuenta" role="tabpanel" aria-labelledby="tab-entrar" novalidate>
+        <div class="con-voz">
+          <label for="entrar-usuario">Tu usuario</label>
+          <button type="button" class="voz" data-leer="entrar-usuario" aria-label="Escuchar qué escribir en usuario" hidden>🔊</button>
+        </div>
+        <input id="entrar-usuario" type="text" maxlength="30" autocomplete="username" autocapitalize="off" spellcheck="false" required>
+        <div class="con-voz">
+          <label for="entrar-pin">Tu PIN de 4 números</label>
+          <button type="button" class="voz" data-leer="entrar-pin" aria-label="Escuchar qué escribir en PIN" hidden>🔊</button>
+        </div>
+        <input id="entrar-pin" class="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="current-password" required>
+        <button type="submit" class="boton" id="boton-entrar">Entrar</button>
+      </form>
+
+      <form id="form-crear" class="formulario-cuenta" role="tabpanel" aria-labelledby="tab-crear" novalidate hidden>
+        <div class="con-voz">
+          <label for="crear-nombre">¿Cómo te llamas?</label>
+          <button type="button" class="voz" data-leer="crear-nombre" aria-label="Escuchar qué escribir en nombre" hidden>🔊</button>
+        </div>
+        <input id="crear-nombre" type="text" maxlength="60" autocomplete="given-name" required>
+        <div class="con-voz">
+          <label for="crear-usuario">Elige un usuario para entrar</label>
+          <button type="button" class="voz" data-leer="crear-usuario" aria-label="Escuchar cómo elegir el usuario" hidden>🔊</button>
+        </div>
+        <p class="nota" id="ayuda-usuario">Entre 3 y 30 letras o números, sin espacios. Por ejemplo: rosa.perez</p>
+        <input id="crear-usuario" type="text" maxlength="30" autocomplete="username" autocapitalize="off" spellcheck="false" aria-describedby="ayuda-usuario" required>
+        <div class="con-voz">
+          <label for="crear-pin">Elige un PIN de 4 números</label>
+          <button type="button" class="voz" data-leer="crear-pin" aria-label="Escuchar cómo elegir el PIN" hidden>🔊</button>
+        </div>
+        <p class="nota" id="ayuda-pin">Que no sean todos iguales ni 1234. Apúntalo en un lugar seguro: lo necesitas para entrar.</p>
+        <input id="crear-pin" class="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="new-password" aria-describedby="ayuda-pin" required>
+        <label for="crear-pin2">Escribe el PIN otra vez</label>
+        <input id="crear-pin2" class="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="new-password" required>
+        <button type="submit" class="boton" id="boton-crear">Crear mi cuenta</button>
+      </form>
+    </section>
+
+    <section id="inicio" class="pantalla" aria-labelledby="titulo-inicio" hidden>
+      <div class="con-voz">
+        <h1 id="titulo-inicio" tabindex="-1">Hola</h1>
         <button type="button" class="voz" data-leer="inicio" aria-label="Escuchar la presentación" hidden>🔊</button>
       </div>
       <p class="intro" id="intro-inicio">Te haré unas pocas preguntas para saber en qué punto estás con la lectura y la escritura, y armar un plan de actividades para ti. No es un examen.</p>
-
-      <div id="usuario-conocido" class="tarjeta" hidden>
-        <div class="con-voz">
-          <p id="texto-usuario-conocido"></p>
-          <button type="button" class="voz" data-leer="usuario-conocido" aria-label="Escuchar el saludo" hidden>🔊</button>
-        </div>
-        <div class="acciones">
-          <button type="button" class="boton secundario ver-historial">Ver mis evaluaciones</button>
-          <button type="button" id="otra-persona" class="enlace">No soy yo: empezar como otra persona</button>
-        </div>
-      </div>
 
       <div id="pendiente" class="tarjeta" hidden>
         <div class="con-voz">
@@ -40,7 +79,6 @@
         </div>
         <div class="acciones">
           <button type="button" id="continuar" class="boton">Continuar donde iba</button>
-          <button type="button" id="descartar" class="boton secundario">Empezar de nuevo</button>
         </div>
       </div>
 
@@ -54,14 +92,11 @@
         </div>
       </div>
 
-      <form id="formulario" novalidate>
-        <div class="con-voz">
-          <label for="alias">¿Cómo te llamas?</label>
-          <button type="button" class="voz" data-leer="alias" aria-label="Escuchar la pregunta del nombre" hidden>🔊</button>
-        </div>
-        <input id="alias" name="alias" type="text" maxlength="60" autocomplete="given-name" required>
-        <button type="submit" class="boton" id="comenzar">Comenzar</button>
-      </form>
+      <div class="acciones">
+        <button type="button" class="boton" id="comenzar">Hacer una evaluación nueva</button>
+        <button type="button" class="boton secundario ver-historial">Ver mis evaluaciones</button>
+        <button type="button" id="cerrar-sesion" class="enlace">Cerrar sesión</button>
+      </div>
     </section>
 
     <section id="pregunta" class="pantalla" aria-labelledby="enunciado" hidden>

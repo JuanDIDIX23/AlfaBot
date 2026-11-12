@@ -1,7 +1,7 @@
 "use strict";
 // Historial del usuario: sus evaluaciones anteriores, el nivel de cada una y su avance por módulo.
 // Usa lo que definen app.js y aprendizaje.js: $, api, aviso, mostrar, lecturas, porcentaje,
-// leerUsuario, olvidarUsuario, guardarId, borrarId, pintar, reiniciar, guardarClave, borrarClave, abrirCamino.
+// guardarId, pintar, reiniciar, guardarClave, abrirCamino.
 
 const ESTADO_MODULO = { superado: "Superado", en_curso: "En curso", pendiente: "Pendiente" };
 const formatoFecha = new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "2-digit" });
@@ -9,11 +9,10 @@ const formatoFecha = new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "
 let ultimoHistorial = null;
 
 Object.assign(lecturas, {
-  "usuario-conocido": () => [texto("texto-usuario-conocido"), "Puedes ver tus evaluaciones o empezar una nueva."],
   historial: () => {
     const h = ultimoHistorial;
     if (!h) return [];
-    const partes = [`Historial de ${h.alias}.`];
+    const partes = [`Historial de ${h.nombre}.`];
     for (const p of h.progreso) partes.push(`Módulo ${p.modulo}, ${p.nombre}: ${ESTADO_MODULO[p.estado].toLowerCase()}.`);
     partes.push(h.evaluaciones.length === 1 ? "Tienes una evaluación." : `Tienes ${h.evaluaciones.length} evaluaciones.`);
     const ultima = h.evaluaciones.find((e) => e.estado === "completada" && e.nivel);
@@ -23,26 +22,16 @@ Object.assign(lecturas, {
 });
 
 async function abrirHistorial() {
-  const usuario = leerUsuario();
-  if (!usuario) {
-    aviso("Primero haz una evaluación para tener historial.");
-    return;
-  }
   try {
-    const h = await api(`/api/usuarios/${encodeURIComponent(usuario.clave)}/historial`);
-    pintarHistorial(h);
+    pintarHistorial(await api("/api/historial"));
   } catch (e) {
-    if (e.estado === 404) {
-      olvidarUsuario();
-      pintarUsuarioConocido();
-    }
     aviso(e.message);
   }
 }
 
 function pintarHistorial(h) {
   ultimoHistorial = h;
-  $("titulo-historial").textContent = `Mis evaluaciones, ${h.alias}`;
+  $("titulo-historial").textContent = `Mis evaluaciones, ${h.nombre}`;
 
   const modulos = $("historial-modulos");
   modulos.replaceChildren();
@@ -83,7 +72,7 @@ function pintarHistorial(h) {
     detalle.className = "nota";
     const preguntas = e.preguntasRespondidas === 1 ? "1 pregunta" : `${e.preguntasRespondidas} preguntas`;
     detalle.textContent = e.ruta
-      ? `${preguntas}. Camino de aprendizaje: ${e.ruta.superadas} de ${e.ruta.total} lecciones superadas.`
+      ? `${preguntas}. Camino de aprendizaje: ${e.ruta.superadas} de ${e.ruta.total} ${e.ruta.total === 1 ? "lección superada" : "lecciones superadas"}.`
       : `${preguntas}.`;
 
     const acciones = document.createElement("div");
@@ -129,22 +118,9 @@ async function abrirCaminoDe(clave) {
   await abrirCamino();
 }
 
-function empezarComoOtraPersona() {
-  olvidarUsuario();
-  borrarId();
-  borrarClave();
-  $("ruta-guardada").hidden = true;
-  reiniciar();
-  $("alias").focus();
-}
-
 function iniciarHistorial() {
   document.querySelectorAll(".ver-historial").forEach((b) => b.addEventListener("click", abrirHistorial));
-  $("otra-persona").addEventListener("click", empezarComoOtraPersona);
-  $("historial-nueva").addEventListener("click", () => {
-    reiniciar();
-    $("alias").focus();
-  });
+  $("historial-nueva").addEventListener("click", comenzar);
   $("historial-volver").addEventListener("click", reiniciar);
 }
 

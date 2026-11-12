@@ -12,6 +12,22 @@ Resumen: 5/5 pruebas del motor.
 
 ### npm run pruebas:api -- --omitir-concurrencia
 
+== Cuentas e inicio de sesión ==
+  OK    Crear una cuenta entrega un token de sesión
+  OK    Con el token, el servidor reconoce la cuenta
+  OK    Un usuario ya usado (sin importar mayúsculas) → 409  (recibió 409)
+  OK    PIN con letras → 400  (recibió 400)
+  OK    PIN de 3 números → 400  (recibió 400)
+  OK    PIN muy fácil (1111) → 400  (recibió 400)
+  OK    Usuario con espacios → 400  (recibió 400)
+  OK    Sin nombre → 400  (recibió 400)
+  OK    Entrar con usuario y PIN correctos → 200 y token nuevo
+  OK    PIN equivocado o usuario inexistente → 401 con el mismo mensaje
+  OK    Tras 5 PIN equivocados la cuenta se bloquea, aunque luego el PIN sea correcto → 429  (recibió 429)
+  OK    Sin sesión no se puede evaluar → 401
+  OK    Con un token inventado → 401
+  OK    Al cerrar sesión el token deja de servir
+
 == Servicio ==
   OK    GET /api/salud llega a la base de conocimiento
   OK    GET /api/hipotesis devuelve las 5 hipótesis
@@ -32,22 +48,14 @@ Resumen: 5/5 pruebas del motor.
   OK    Consultar no duplica el plan guardado  (2 filas)
   OK    Una evaluación a medias se reanuda con la misma pregunta
 
-== Usuario reconocido e historial ==
-  OK    Una evaluación nueva entrega la clave aleatoria del usuario
-  OK    Con su clave, el mismo usuario acumula otra evaluación
-  OK    Mismo nombre sin clave es otra persona (no ve el historial ajeno)
-  OK    El historial lista sus evaluaciones (la más reciente primero) y el progreso por módulo  (2 evaluaciones)
+== Historial y privacidad ==
+  OK    El historial lista las evaluaciones de la cuenta, la más reciente primero  (5 evaluaciones)
+  OK    Una evaluación terminada muestra su nivel y el progreso por módulo queda guardado
   OK    Una evaluación sin respuestas no muestra nivel
-  OK    Una evaluación terminada muestra su nivel diagnosticado y el progreso por módulo
-  OK    Historial con clave inexistente → 404
-  OK    Historial con clave mal formada → 404
-  OK    Clave de usuario que no es texto → 400
+  OK    Otra cuenta no puede ver ni responder evaluaciones ajenas → 404
+  OK    El historial de otra cuenta no incluye evaluaciones ajenas
 
 == Entradas inválidas ==
-  OK    Alias vacío → 400  (recibió 400)
-  OK    Sin alias → 400  (recibió 400)
-  OK    Alias demasiado largo → 400  (recibió 400)
-  OK    Alias que no es texto → 400  (recibió 400)
   OK    JSON mal formado → 400  (recibió 400)
   OK    Cuerpo demasiado grande → 413  (recibió 413)
   OK    Evaluación inexistente → 404  (recibió 404)
@@ -62,9 +70,9 @@ Resumen: 5/5 pruebas del motor.
   OK    La interfaz web se sirve en /
 
 == Rendimiento (RNF-03) ==
-  OK    Todas las respuestas de la API en menos de 2 segundos  (51 peticiones: mediana 39 ms, p95 94 ms, máximo 109 ms)
+  OK    Todas las respuestas de la API en menos de 2 segundos  (67 peticiones: mediana 63 ms, p95 153 ms, máximo 244 ms)
 
-Resumen: 37/37 verificaciones correctas
+Resumen: 43/43 verificaciones correctas
 
 ### npm run pruebas:aprendizaje
 Generadores de ejercicios
@@ -108,6 +116,7 @@ Recorrido por la API
   OK    no se puede crear la ruta de una evaluación sin terminar
   OK    crea la ruta con una clave aleatoria y una sola lección disponible
   OK    la ruta de una evaluación se crea una sola vez
+  OK    el camino de una persona no lo puede abrir otra cuenta, ni nadie sin sesión
   OK    claves inválidas o ajenas no dan acceso
   OK    una lección bloqueada no se puede practicar
   OK    rechaza resultados que no corresponden a la lección
@@ -117,4 +126,4 @@ Recorrido por la API
   OK    una lección superada se puede repasar
   OK    el progreso por módulo queda guardado
 
-45 de 45 pruebas pasaron
+46 de 46 pruebas pasaron

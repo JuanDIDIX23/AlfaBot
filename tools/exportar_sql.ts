@@ -6,7 +6,7 @@ import * as path from "path";
  *
  *   alfabot_base_de_datos.sql    script completo de creación y carga, en el orden correcto:
  *                                esquema, 40 reglas, 5 hipótesis, 200 verosimilitudes, 25 lecciones
- *                                e historial. Es la unión de sql/01, 02, 04 y 05.
+ *                                historial y cuentas. Es la unión de sql/01, 02, 04, 05 y 06.
  *   alfabot_schema_export.sql    solo el esquema, exportado con la herramienta del gestor:
  *                                  pg_dump --schema-only --no-owner --no-privileges "$DATABASE_URL"
  *                                    > entregables/alfabot_schema_export.sql
@@ -16,7 +16,7 @@ import * as path from "path";
  * El rol de aplicación (sql/03) no se incluye: necesita una clave y lo crea `npm run cargar-bd`.
  */
 const RAIZ = path.join(__dirname, "..");
-const PARTES = ["01_conocimiento_y_transaccional.sql", "02_inferencia.sql", "04_aprendizaje.sql", "05_historial.sql"];
+const PARTES = ["01_conocimiento_y_transaccional.sql", "02_inferencia.sql", "04_aprendizaje.sql", "05_historial.sql", "06_cuentas.sql"];
 
 const encabezado = `-- ============================================================
 -- AlfaBot — script completo de creación y carga (PostgreSQL)

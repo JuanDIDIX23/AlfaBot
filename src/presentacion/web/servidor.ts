@@ -3,6 +3,8 @@ import { ConocimientoRepositorioPg } from "../../datos/ConocimientoRepositorioPg
 import { EvaluacionRepositorioPg } from "../../datos/EvaluacionRepositorioPg";
 import { AprendizajeRepositorioPg } from "../../datos/AprendizajeRepositorioPg";
 import { ServicioAprendizaje } from "../../negocio/aprendizaje/ServicioAprendizaje";
+import { CuentaRepositorioPg } from "../../datos/CuentaRepositorioPg";
+import { ServicioCuentas } from "../../negocio/ServicioCuentas";
 import { ServicioDiagnostico } from "../../negocio/ServicioDiagnostico";
 import { crearApp } from "./app";
 import { ControladorApi } from "./ControladorApi";
@@ -13,7 +15,11 @@ const db = Conexion.obtener();
 const conocimiento = new ConocimientoRepositorioPg(db);
 const servicio = new ServicioDiagnostico(conocimiento, new EvaluacionRepositorioPg(db));
 const aprendizaje = new ServicioAprendizaje(new AprendizajeRepositorioPg(db));
-const app = crearApp(new ControladorApi(servicio, conocimiento, aprendizaje), new ControladorAprendizaje(aprendizaje));
+const app = crearApp({
+  api: new ControladorApi(servicio, conocimiento, aprendizaje),
+  cuentas: new ServicioCuentas(new CuentaRepositorioPg(db)),
+  aprendizaje: new ControladorAprendizaje(aprendizaje),
+});
 
 const puerto = Number(process.env.PORT ?? 3000);
 const servidor = app.listen(puerto, () => console.log(`AlfaBot escuchando en el puerto ${puerto}`));

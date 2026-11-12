@@ -455,7 +455,7 @@ function iniciarAprendizaje() {
   $("seguir-aprendiendo").addEventListener("click", abrirCamino);
   $("empezar-ronda").addEventListener("click", empezarRonda);
   $("ej-siguiente").addEventListener("click", siguienteEjercicio);
-  $("nueva-evaluacion").addEventListener("click", reiniciar);
+  $("nueva-evaluacion").addEventListener("click", comenzar);
   document.querySelectorAll(".volver-camino").forEach((b) => b.addEventListener("click", () => {
     if (aprendizaje.ruta) pintarCamino(aprendizaje.ruta);
     else abrirCamino();

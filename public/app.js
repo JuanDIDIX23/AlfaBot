@@ -2,8 +2,11 @@
 
 const $ = (id) => document.getElementById(id);
 const CLAVE = "alfabot.evaluacion";
-const pantallas = ["inicio", "pregunta", "resultado", "historial", "camino", "leccion", "ejercicio", "fin-ronda"];
-const CLAVE_USUARIO = "alfabot.usuario";
+const pantallas = ["acceso", "inicio", "pregunta", "resultado", "historial", "camino", "leccion", "ejercicio", "fin-ronda"];
+const CLAVE_SESION = "alfabot.sesion";
+
+/** La cuenta con sesión iniciada: { usuario, nombre } o null. */
+let cuenta = null;
 
 // ---------------------------------------------------------------- utilidades
 
@@ -17,18 +20,22 @@ function borrarId() {
   try { localStorage.removeItem(CLAVE); } catch (_) { /* sin almacenamiento: no pasa nada */ }
 }
 
-/** El usuario que este navegador ya conoce: { clave, alias } o null. */
-function leerUsuario() {
+/** Token de la sesión iniciada en este navegador (lo entrega el servidor al entrar). */
+function leerToken() {
+  try { return localStorage.getItem(CLAVE_SESION); } catch (_) { return null; }
+}
+function guardarToken(token) {
+  try { localStorage.setItem(CLAVE_SESION, token); } catch (_) { /* sin almacenamiento: la sesión dura hasta recargar */ }
+  tokenEnMemoria = token;
+}
+let tokenEnMemoria = null;
+/** Al salir se borra todo lo que este navegador recordaba de la persona. */
+function olvidarSesion() {
+  tokenEnMemoria = null;
+  cuenta = null;
   try {
-    const u = JSON.parse(localStorage.getItem(CLAVE_USUARIO));
-    return u && typeof u.clave === "string" && typeof u.alias === "string" ? u : null;
-  } catch (_) { return null; }
-}
-function guardarUsuario(usuario) {
-  try { localStorage.setItem(CLAVE_USUARIO, JSON.stringify({ clave: usuario.clave, alias: usuario.alias })); } catch (_) { /* sin almacenamiento */ }
-}
-function olvidarUsuario() {
-  try { localStorage.removeItem(CLAVE_USUARIO); } catch (_) { /* sin almacenamiento */ }
+    for (const k of [CLAVE_SESION, CLAVE, "alfabot.ruta", "alfabot.usuario"]) localStorage.removeItem(k);
+  } catch (_) { /* sin almacenamiento */ }
 }
 
 function aviso(texto) {
@@ -46,16 +53,22 @@ function mostrar(nombre, foco) {
 
 async function api(ruta, opciones = {}) {
   let respuesta;
+  const headers = {};
+  if (opciones.body) headers["Content-Type"] = "application/json";
+  const token = leerToken() || tokenEnMemoria;
+  if (token) headers.Authorization = `Bearer ${token}`;
   try {
-    respuesta = await fetch(ruta, {
-      ...opciones,
-      headers: opciones.body ? { "Content-Type": "application/json" } : undefined,
-    });
+    respuesta = await fetch(ruta, { ...opciones, headers });
   } catch (_) {
     throw new Error("No pude conectarme con el servicio. Revisa tu internet e intenta otra vez.");
   }
   let cuerpo = null;
   try { cuerpo = await respuesta.json(); } catch (_) { /* respuesta sin cuerpo JSON */ }
+  if (respuesta.status === 401 && cuerpo && cuerpo.motivo === "sin_sesion") {
+    // La sesión venció o se cerró en otro lado: se vuelve a la pantalla de entrar.
+    olvidarSesion();
+    mostrarAcceso("Tu sesión terminó. Entra otra vez con tu usuario y tu PIN.");
+  }
   if (!respuesta.ok) {
     const error = new Error((cuerpo && cuerpo.error) || "El servicio no pudo responder.");
     error.estado = respuesta.status;
@@ -147,9 +160,14 @@ const texto = (id) => $(id).textContent.trim();
 
 // Qué se lee con cada botón 🔊 que ya está escrito en el HTML (atributo data-leer).
 const lecturas = {
-  inicio: () => [texto("titulo-inicio"), texto("intro-inicio")],
-  pendiente: () => [texto("texto-pendiente"), "Puedes continuar donde ibas, o empezar de nuevo."],
-  alias: () => ["¿Cómo te llamas? Escribe tu nombre y luego toca el botón Comenzar."],
+  inicio: () => [texto("titulo-inicio"), texto("intro-inicio"), "Toca Hacer una evaluación nueva para empezar."],
+  pendiente: () => [texto("texto-pendiente"), "Toca Continuar donde iba para seguir."],
+  acceso: () => [texto("titulo-acceso"), texto("intro-acceso"), "Si ya tienes cuenta, escribe tu usuario y tu PIN. Si eres nuevo, toca Soy nuevo."],
+  "entrar-usuario": () => ["Escribe tu usuario: el nombre que elegiste para entrar."],
+  "entrar-pin": () => ["Escribe tu PIN: los 4 números que elegiste. Luego toca Entrar."],
+  "crear-nombre": () => ["¿Cómo te llamas? Escribe tu nombre."],
+  "crear-usuario": () => ["Elige un usuario para entrar. Puede ser tu nombre y tu apellido unidos con un punto, sin espacios."],
+  "crear-pin": () => ["Elige un PIN de 4 números. Que no sean todos iguales ni 1, 2, 3, 4. Apúntalo para no olvidarlo. Después escríbelo otra vez abajo."],
   pregunta: () => [
     texto("enunciado"),
     ...[...document.querySelectorAll("#opciones .opcion")].map((b, i) => `Opción ${i + 1}: ${b.textContent.trim()}.`),
@@ -270,21 +288,11 @@ function pintar(estado, regla) {
 
 // ---------------------------------------------------------------- acciones
 
-async function comenzar(evento) {
-  evento.preventDefault();
-  const alias = $("alias").value.trim();
-  if (!alias) {
-    aviso("Escribe tu nombre para empezar.");
-    $("alias").focus();
-    return;
-  }
+async function comenzar() {
   const boton = $("comenzar");
   boton.disabled = true;
   try {
-    const conocido = leerUsuario();
-    const cuerpo = conocido ? { alias, clave: conocido.clave } : { alias };
-    const estado = await api("/api/evaluaciones", { method: "POST", body: JSON.stringify(cuerpo) });
-    if (estado.usuario) guardarUsuario(estado.usuario);
+    const estado = await api("/api/evaluaciones", { method: "POST" });
     guardarId(estado.evaluacionId);
     pintar(estado, null);
   } catch (e) {
@@ -318,19 +326,134 @@ async function continuarEvaluacion() {
   }
 }
 
+/** Vuelve al inicio de la cuenta, con los avisos al día (evaluación a medias, camino en marcha). */
 function reiniciar() {
-  borrarId();
-  $("pendiente").hidden = true;
-  pintarUsuarioConocido();
+  return cargarInicio();
+}
+
+/**
+ * Inicio de la cuenta: lo que hay pendiente se lee del historial guardado en el servidor, así que
+ * es lo mismo en cualquier dispositivo donde la persona entre.
+ */
+async function cargarInicio() {
+  if (!cuenta) return mostrarAcceso();
+  $("titulo-inicio").textContent = `Hola, ${cuenta.nombre}`;
+  let h = null;
+  try {
+    h = await api("/api/historial");
+  } catch (e) {
+    if (!cuenta) return; // la sesión venció: ya se mostró la pantalla de entrar
+    aviso(e.message);
+  }
+  const pendiente = h && h.evaluaciones.find((e) => e.estado === "en_curso" && e.preguntasRespondidas > 0);
+  const conRuta = h && h.evaluaciones.find((e) => e.ruta);
+  if (pendiente) guardarId(pendiente.evaluacionId);
+  else borrarId();
+  if (conRuta) guardarClave(conRuta.ruta.clave);
+  else borrarClave();
+  $("pendiente").hidden = !pendiente;
+  $("ruta-guardada").hidden = !conRuta;
+  if (conRuta) {
+    $("texto-ruta-guardada").textContent =
+      `Tienes un plan de aprendizaje en marcha: ${conRuta.ruta.superadas} de ${conRuta.ruta.total} ${conRuta.ruta.total === 1 ? "lección superada" : "lecciones superadas"}.`;
+  }
   mostrar("inicio", $("titulo-inicio"));
 }
 
-/** En el inicio: saluda a quien ya usó la página en este navegador y le deja su nombre escrito. */
-function pintarUsuarioConocido() {
-  const u = leerUsuario();
-  $("usuario-conocido").hidden = !u;
-  $("alias").value = u ? u.alias : "";
-  if (u) $("texto-usuario-conocido").textContent = `Hola de nuevo, ${u.alias}.`;
+// ---------------------------------------------------------------- cuenta y sesión
+
+function mostrarAcceso(mensaje) {
+  elegirPestana("entrar");
+  mostrar("acceso", $("titulo-acceso"));
+  if (mensaje) aviso(mensaje);
+}
+
+function elegirPestana(cual) {
+  const entrar = cual === "entrar";
+  $("tab-entrar").setAttribute("aria-selected", String(entrar));
+  $("tab-crear").setAttribute("aria-selected", String(!entrar));
+  $("form-entrar").hidden = !entrar;
+  $("form-crear").hidden = entrar;
+  aviso("");
+}
+
+const soloNumeros = (input) => input.addEventListener("input", () => {
+  input.value = input.value.replace(/\D/g, "").slice(0, 4);
+});
+
+async function sesionIniciada(r) {
+  guardarToken(r.token);
+  cuenta = r.cuenta;
+  for (const id of ["entrar-pin", "crear-pin", "crear-pin2"]) $(id).value = "";
+  await cargarInicio();
+}
+
+async function entrar(evento) {
+  evento.preventDefault();
+  const usuario = $("entrar-usuario").value.trim();
+  const pin = $("entrar-pin").value;
+  if (!usuario) return avisarCampo("Escribe tu usuario.", "entrar-usuario");
+  if (!/^\d{4}$/.test(pin)) return avisarCampo("El PIN tiene 4 números.", "entrar-pin");
+  const boton = $("boton-entrar");
+  boton.disabled = true;
+  try {
+    await sesionIniciada(await api("/api/sesiones", { method: "POST", body: JSON.stringify({ usuario, pin }) }));
+  } catch (e) {
+    $("entrar-pin").value = "";
+    avisarCampo(e.message, "entrar-pin");
+  } finally {
+    boton.disabled = false;
+  }
+}
+
+async function crearCuenta(evento) {
+  evento.preventDefault();
+  const nombre = $("crear-nombre").value.trim();
+  const usuario = $("crear-usuario").value.trim();
+  const pin = $("crear-pin").value;
+  if (!nombre) return avisarCampo("Escribe tu nombre.", "crear-nombre");
+  if (!/^[A-Za-z0-9ñÑáéíóúÁÉÍÓÚüÜ._-]{3,30}$/.test(usuario)) {
+    return avisarCampo("El usuario debe tener entre 3 y 30 letras o números, sin espacios.", "crear-usuario");
+  }
+  if (!/^\d{4}$/.test(pin)) return avisarCampo("El PIN debe tener 4 números.", "crear-pin");
+  if (pin !== $("crear-pin2").value) {
+    $("crear-pin2").value = "";
+    return avisarCampo("Los dos PIN no son iguales. Escríbelo otra vez.", "crear-pin2");
+  }
+  const boton = $("boton-crear");
+  boton.disabled = true;
+  try {
+    await sesionIniciada(await api("/api/cuentas", { method: "POST", body: JSON.stringify({ nombre, usuario, pin }) }));
+  } catch (e) {
+    avisarCampo(e.message, /usuario/i.test(e.message) ? "crear-usuario" : "crear-pin");
+  } finally {
+    boton.disabled = false;
+  }
+}
+
+function avisarCampo(mensaje, id) {
+  aviso(mensaje);
+  decir(mensaje);
+  $(id).focus();
+}
+
+async function cerrarSesion() {
+  try { await api("/api/sesiones", { method: "DELETE" }); } catch (_) { /* aunque falle, se olvida aquí */ }
+  olvidarSesion();
+  $("entrar-usuario").value = "";
+  mostrarAcceso();
+}
+
+/** Al abrir la página: si este navegador tiene una sesión vigente, entra directo. */
+async function retomarSesion() {
+  if (!leerToken()) return mostrarAcceso();
+  try {
+    cuenta = (await api("/api/sesiones")).cuenta;
+    await cargarInicio();
+  } catch (_) {
+    if (!$("acceso").hidden) return; // ya se mostró por sesión vencida
+    mostrarAcceso();
+  }
 }
 
 async function revisarServicio() {
@@ -346,14 +469,19 @@ async function revisarServicio() {
 }
 
 async function iniciar() {
-  $("formulario").addEventListener("submit", comenzar);
+  $("comenzar").addEventListener("click", comenzar);
   $("continuar").addEventListener("click", continuarEvaluacion);
-  $("descartar").addEventListener("click", reiniciar);
   $("reiniciar").addEventListener("click", reiniciar);
-  if (leerId()) $("pendiente").hidden = false;
-  pintarUsuarioConocido();
+  $("form-entrar").addEventListener("submit", entrar);
+  $("form-crear").addEventListener("submit", crearCuenta);
+  $("tab-entrar").addEventListener("click", () => elegirPestana("entrar"));
+  $("tab-crear").addEventListener("click", () => elegirPestana("crear"));
+  $("cerrar-sesion").addEventListener("click", cerrarSesion);
+  ["entrar-pin", "crear-pin", "crear-pin2"].forEach((id) => soloNumeros($(id)));
   prepararVoz();
   revisarServicio();
+  // Se espera a que carguen aprendizaje.js e historial.js, que agregan funciones al inicio.
+  window.addEventListener("load", retomarSesion);
 }
 
 iniciar();

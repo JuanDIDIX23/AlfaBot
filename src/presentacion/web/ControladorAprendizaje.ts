@@ -2,12 +2,13 @@ import { ErrorAprendizaje, ServicioAprendizaje } from "../../negocio/aprendizaje
 import { LeccionEnRuta, ResultadoEjercicio, Ruta } from "../../negocio/aprendizaje/Modelos";
 import { EJERCICIOS_POR_RONDA } from "../../negocio/aprendizaje/GeneradorEjercicios";
 import { ErrorHttp, RespuestaHttp } from "./ControladorApi";
+import { Cuenta } from "../../negocio/ServicioCuentas";
 
 const ID_MAXIMO = 2_147_483_647;
 const OBJETIVO_MAXIMO = 40;
 
 /**
- * API del módulo de aprendizaje:
+ * API del módulo de aprendizaje (todas las rutas exigen sesión; cada persona solo ve sus caminos):
  *
  *   POST /api/evaluaciones/:id/ruta                        crea el plan de aprendizaje de una evaluación terminada
  *   GET  /api/rutas/:clave                                 consulta el plan y el avance
@@ -17,20 +18,20 @@ const OBJETIVO_MAXIMO = 40;
 export class ControladorAprendizaje {
   constructor(private readonly servicio: ServicioAprendizaje) {}
 
-  async crearRuta(idTexto: string): Promise<RespuestaHttp> {
+  async crearRuta(cuenta: Cuenta, idTexto: string): Promise<RespuestaHttp> {
     const id = this.validarId(idTexto, "No existe esa evaluación");
-    const { clave, ruta } = await this.traducir(() => this.servicio.crearRuta(id));
+    const { clave, ruta } = await this.traducir(() => this.servicio.crearRuta(id, cuenta.id));
     return { estado: 201, cuerpo: { clave, ruta: this.ruta(ruta) } };
   }
 
-  async consultarRuta(clave: string): Promise<RespuestaHttp> {
-    const ruta = await this.traducir(() => this.servicio.ruta(clave));
+  async consultarRuta(cuenta: Cuenta, clave: string): Promise<RespuestaHttp> {
+    const ruta = await this.traducir(() => this.servicio.ruta(clave, cuenta.id));
     return { estado: 200, cuerpo: this.ruta(ruta) };
   }
 
-  async nuevaRonda(clave: string, leccionTexto: string): Promise<RespuestaHttp> {
+  async nuevaRonda(cuenta: Cuenta, clave: string, leccionTexto: string): Promise<RespuestaHttp> {
     const id = this.validarId(leccionTexto, "Esa lección no está en tu plan");
-    const { leccion, ejercicios } = await this.traducir(() => this.servicio.nuevaRonda(clave, id));
+    const { leccion, ejercicios } = await this.traducir(() => this.servicio.nuevaRonda(clave, cuenta.id, id));
     return {
       estado: 200,
       cuerpo: {
@@ -40,11 +41,11 @@ export class ControladorAprendizaje {
     };
   }
 
-  async terminarRonda(clave: string, leccionTexto: string, cuerpo: unknown): Promise<RespuestaHttp> {
+  async terminarRonda(cuenta: Cuenta, clave: string, leccionTexto: string, cuerpo: unknown): Promise<RespuestaHttp> {
     const id = this.validarId(leccionTexto, "Esa lección no está en tu plan");
     const resultados = this.validarResultados(cuerpo);
-    const resumen = await this.traducir(() => this.servicio.terminarRonda(clave, id, resultados));
-    const ruta = await this.traducir(() => this.servicio.ruta(clave));
+    const resumen = await this.traducir(() => this.servicio.terminarRonda(clave, cuenta.id, id, resultados));
+    const ruta = await this.traducir(() => this.servicio.ruta(clave, cuenta.id));
     return {
       estado: 200,
       cuerpo: {

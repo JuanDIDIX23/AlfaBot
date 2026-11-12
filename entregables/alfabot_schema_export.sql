@@ -512,6 +512,40 @@ ALTER SEQUENCE public.rutas_id_seq OWNED BY public.rutas.id;
 
 
 --
+-- Name: sesiones; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sesiones (
+    id integer NOT NULL,
+    usuario_id integer NOT NULL,
+    token_hash character(64) NOT NULL,
+    fecha_creacion timestamp without time zone DEFAULT now() NOT NULL,
+    expira timestamp without time zone NOT NULL,
+    cerrada boolean DEFAULT false NOT NULL
+);
+
+
+--
+-- Name: sesiones_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.sesiones_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: sesiones_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.sesiones_id_seq OWNED BY public.sesiones.id;
+
+
+--
 -- Name: usuarios; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -519,7 +553,11 @@ CREATE TABLE public.usuarios (
     id integer NOT NULL,
     alias character varying(50) NOT NULL,
     fecha_registro timestamp without time zone DEFAULT now() NOT NULL,
-    clave uuid
+    clave uuid,
+    usuario character varying(30),
+    pin_hash character varying(200),
+    intentos_fallidos integer DEFAULT 0 NOT NULL,
+    bloqueado_hasta timestamp without time zone
 );
 
 
@@ -651,6 +689,13 @@ ALTER TABLE ONLY public.ruta_lecciones ALTER COLUMN id SET DEFAULT nextval('publ
 --
 
 ALTER TABLE ONLY public.rutas ALTER COLUMN id SET DEFAULT nextval('public.rutas_id_seq'::regclass);
+
+
+--
+-- Name: sesiones id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sesiones ALTER COLUMN id SET DEFAULT nextval('public.sesiones_id_seq'::regclass);
 
 
 --
@@ -901,6 +946,22 @@ ALTER TABLE ONLY public.rutas
 
 
 --
+-- Name: sesiones sesiones_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sesiones
+    ADD CONSTRAINT sesiones_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sesiones sesiones_token_hash_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sesiones
+    ADD CONSTRAINT sesiones_token_hash_key UNIQUE (token_hash);
+
+
+--
 -- Name: usuarios usuarios_clave_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -914,6 +975,14 @@ ALTER TABLE ONLY public.usuarios
 
 ALTER TABLE ONLY public.usuarios
     ADD CONSTRAINT usuarios_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: usuarios usuarios_usuario_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.usuarios
+    ADD CONSTRAINT usuarios_usuario_key UNIQUE (usuario);
 
 
 --
@@ -1006,6 +1075,13 @@ CREATE INDEX idx_respuestas_evaluacion ON public.respuestas USING btree (evaluac
 --
 
 CREATE INDEX idx_ruta_lecciones_ruta ON public.ruta_lecciones USING btree (ruta_id);
+
+
+--
+-- Name: idx_sesiones_usuario; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_sesiones_usuario ON public.sesiones USING btree (usuario_id);
 
 
 --
@@ -1213,6 +1289,14 @@ ALTER TABLE ONLY public.rutas
 
 ALTER TABLE ONLY public.rutas
     ADD CONSTRAINT rutas_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.usuarios(id);
+
+
+--
+-- Name: sesiones sesiones_usuario_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sesiones
+    ADD CONSTRAINT sesiones_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.usuarios(id);
 
 
 --

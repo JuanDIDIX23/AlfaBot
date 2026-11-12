@@ -175,3 +175,18 @@ input[type="text"]:focus-visible, .boton:focus-visible, .opcion:focus-visible, s
 .evaluacion-item p { margin: 0 0 0.2rem; }
 .evaluacion-item .titulo { font-weight: 700; }
 .acciones-fila { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 0.6rem; }
+
+/* ============================================ cuentas */
+.pestanas { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 1.2rem; }
+.pestana { font: inherit; font-weight: 700; padding: 14px 10px; border: 2px solid var(--verde); border-radius: 14px; background: #fff; color: var(--verde); cursor: pointer; }
+.pestana[aria-selected="true"] { background: var(--verde); color: #fff; }
+.pestana:focus-visible { outline: 3px solid var(--naranja); outline-offset: 2px; }
+.formulario-cuenta .nota { margin: -0.2rem 0 0.4rem; }
+.formulario-cuenta .con-voz { margin-bottom: 0.4rem; }
+input[type="password"] {
+  width: 100%; font: inherit; padding: 14px; border: 2px solid var(--borde); border-radius: 12px; background: #fff; color: inherit; margin-bottom: 1rem;
+}
+input[type="password"]:focus-visible { outline: 3px solid var(--naranja); outline-offset: 2px; }
+input.pin { font-size: 2rem; letter-spacing: 0.6em; text-align: center; max-width: 14rem; }
+#inicio > .acciones { margin-top: 1rem; }
+#cerrar-sesion { justify-self: center; }

@@ -14,6 +14,8 @@ import { PALABRAS } from "../negocio/aprendizaje/Vocabulario";
 import { crearApp } from "../presentacion/web/app";
 import { ControladorApi } from "../presentacion/web/ControladorApi";
 import { ControladorAprendizaje } from "../presentacion/web/ControladorAprendizaje";
+import { CuentaRepositorioPg } from "../datos/CuentaRepositorioPg";
+import { ServicioCuentas } from "../negocio/ServicioCuentas";
 
 /**
  * Pruebas del módulo de aprendizaje, contra PostgreSQL (las lecciones viven en la base de conocimiento):
@@ -83,6 +85,7 @@ async function limpiar(db: ReturnType<typeof Conexion.obtener>): Promise<void> {
     }
     await db.query(`DELETE FROM evaluaciones WHERE usuario_id IN (${usuarios})`, [PREFIJO + "%"]);
     await db.query(`DELETE FROM progreso WHERE usuario_id IN (${usuarios})`, [PREFIJO + "%"]);
+    await db.query(`DELETE FROM sesiones WHERE usuario_id IN (${usuarios})`, [PREFIJO + "%"]);
     await db.query(`DELETE FROM usuarios WHERE alias LIKE $1`, [PREFIJO + "%"]);
   } catch (e) {
     console.log(`\n  (Limpieza omitida: ${e instanceof Error ? e.message : e}. Se borra con un usuario administrador.)`);
@@ -199,15 +202,20 @@ async function main(): Promise<void> {
   console.log("Recorrido por la API");
   const conocimiento = new ConocimientoRepositorioPg(db);
   const servicio = new ServicioDiagnostico(conocimiento, new EvaluacionRepositorioPg(db));
-  const servidor = crearApp(
-    new ControladorApi(servicio, conocimiento),
-    new ControladorAprendizaje(new ServicioAprendizaje(repo)),
-  ).listen(0);
+  const servidor = crearApp({
+    api: new ControladorApi(servicio, conocimiento),
+    cuentas: new ServicioCuentas(new CuentaRepositorioPg(db)),
+    aprendizaje: new ControladorAprendizaje(new ServicioAprendizaje(repo)),
+  }).listen(0);
   const base = `http://127.0.0.1:${(servidor.address() as AddressInfo).port}`;
-  const http = async (metodo: string, ruta: string, cuerpo?: unknown) => {
+  let token = "";
+  const http = async (metodo: string, ruta: string, cuerpo?: unknown, conToken = token) => {
+    const headers: Record<string, string> = {};
+    if (cuerpo !== undefined) headers["Content-Type"] = "application/json";
+    if (conToken) headers.Authorization = `Bearer ${conToken}`;
     const r = await fetch(base + ruta, {
       method: metodo,
-      headers: cuerpo !== undefined ? { "Content-Type": "application/json" } : undefined,
+      headers,
       body: cuerpo !== undefined ? JSON.stringify(cuerpo) : undefined,
     });
     let json: Json = null;
@@ -216,7 +224,10 @@ async function main(): Promise<void> {
   };
 
   try {
-    let e: Json = (await http("POST", "/api/evaluaciones", { alias: PREFIJO + "ruta" })).json;
+    const sufijo = Date.now().toString(36);
+    token = (await http("POST", "/api/cuentas", { usuario: `aprendizaje-${sufijo}`, pin: "2580", nombre: PREFIJO + "ruta" })).json.token;
+    const otro = (await http("POST", "/api/cuentas", { usuario: `aprendizaje-otro-${sufijo}`, pin: "2580", nombre: PREFIJO + "otro" })).json.token;
+    let e: Json = (await http("POST", "/api/evaluaciones")).json;
     const evaluacionId = e.evaluacionId;
 
     await probar("no se puede crear la ruta de una evaluación sin terminar", async () => {
@@ -237,6 +248,11 @@ async function main(): Promise<void> {
     });
     await probar("la ruta de una evaluación se crea una sola vez", async () => {
       assert.strictEqual((await http("POST", `/api/evaluaciones/${evaluacionId}/ruta`)).estado, 409);
+    });
+    await probar("el camino de una persona no lo puede abrir otra cuenta, ni nadie sin sesión", async () => {
+      assert.strictEqual((await http("GET", `/api/rutas/${clave}`, undefined, otro)).estado, 404);
+      assert.strictEqual((await http("POST", `/api/evaluaciones/${evaluacionId}/ruta`, undefined, otro)).estado, 404);
+      assert.strictEqual((await http("GET", `/api/rutas/${clave}`, undefined, "")).estado, 401);
     });
     await probar("claves inválidas o ajenas no dan acceso", async () => {
       assert.strictEqual((await http("GET", "/api/rutas/1")).estado, 404);

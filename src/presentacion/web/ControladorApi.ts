@@ -4,6 +4,7 @@ import { IConocimientoRepositorio } from "../../negocio/Repositorios";
 import { Creencia } from "../../negocio/modelos/Hipotesis";
 import { Pregunta, ResultadoDiagnostico } from "../../negocio/modelos/Resultados";
 import { ServicioAprendizaje } from "../../negocio/aprendizaje/ServicioAprendizaje";
+import { Cuenta } from "../../negocio/ServicioCuentas";
 
 /** Respuesta HTTP independiente del framework: así el controlador se prueba sin levantar un servidor. */
 export interface RespuestaHttp {
@@ -21,17 +22,17 @@ export class ErrorHttp extends Error {
   }
 }
 
-const ALIAS_MAXIMO = 60;
 const ID_MAXIMO = 2_147_483_647;
 
 /**
  * Controlador de la API REST del sistema experto. Traduce peticiones JSON a llamadas de la capa de
- * negocio y devuelve DTOs: no contiene lógica de inferencia.
+ * negocio y devuelve DTOs: no contiene lógica de inferencia. Todo lo que es de una persona exige
+ * sesión iniciada (lo resuelve app.ts) y solo se le muestra a su dueño.
  *
  *   POST /api/evaluaciones                    abre una evaluación y devuelve la primera pregunta
  *   POST /api/evaluaciones/:id/respuestas     registra una respuesta y devuelve el nuevo estado
  *   GET  /api/evaluaciones/:id                consulta el estado (pregunta pendiente o resultado)
- *   GET  /api/usuarios/:clave/historial       evaluaciones anteriores, su nivel y el progreso por módulo
+ *   GET  /api/historial                       evaluaciones anteriores, su nivel y el progreso por módulo
  *   GET  /api/hipotesis                       las cinco hipótesis de la base de conocimiento
  *   GET  /api/salud                           verifica que el servicio llega a la base de conocimiento
  */
@@ -56,30 +57,21 @@ export class ControladorApi {
     };
   }
 
-  async iniciar(cuerpo: unknown): Promise<RespuestaHttp> {
-    const alias = this.validarAlias(cuerpo);
-    const clave = this.validarClaveOpcional(cuerpo);
-    const usuario = await this.servicio.identificarUsuario(alias, clave);
-    const sesion = await this.servicio.abrirEvaluacion(usuario);
-    return {
-      estado: 201,
-      cuerpo: {
-        ...(await this.estadoDe(sesion, false)),
-        usuario: { clave: usuario.clave, alias: usuario.alias, nuevo: usuario.nuevo },
-      },
-    };
+  async iniciar(cuenta: Cuenta): Promise<RespuestaHttp> {
+    const sesion = await this.servicio.abrirEvaluacion({ id: cuenta.id });
+    return { estado: 201, cuerpo: await this.estadoDe(sesion, false) };
   }
 
-  async historial(clave: string): Promise<RespuestaHttp> {
-    const h = await this.servicio.historial(clave);
-    if (h === null) throw new ErrorHttp(404, "No encontré tu historial");
+  async historial(cuenta: Cuenta): Promise<RespuestaHttp> {
+    const h = await this.servicio.historial(cuenta.id);
     const rutas = this.aprendizaje
       ? await this.aprendizaje.rutasDeEvaluaciones(h.evaluaciones.map((e) => e.evaluacionId))
       : new Map();
     return {
       estado: 200,
       cuerpo: {
-        alias: h.alias,
+        nombre: cuenta.nombre,
+        usuario: cuenta.usuario,
         evaluaciones: h.evaluaciones.map((e) => {
           const ruta = rutas.get(e.evaluacionId);
           return {
@@ -98,13 +90,11 @@ export class ControladorApi {
     };
   }
 
-  async responder(idTexto: string, cuerpo: unknown): Promise<RespuestaHttp> {
+  async responder(cuenta: Cuenta, idTexto: string, cuerpo: unknown): Promise<RespuestaHttp> {
     const id = this.validarId(idTexto);
     const ramaId = this.validarRama(cuerpo);
 
-    const reanudada = await this.servicio.reanudarSesion(id);
-    if (reanudada === null) throw new ErrorHttp(404, "No existe esa evaluación");
-    const { sesion, completada } = reanudada;
+    const { sesion, completada } = await this.reanudarPropia(cuenta, id);
     if (completada) throw new ErrorHttp(409, "Esa evaluación ya terminó");
 
     const pregunta = await sesion.siguientePregunta();
@@ -127,11 +117,17 @@ export class ControladorApi {
     };
   }
 
-  async consultar(idTexto: string): Promise<RespuestaHttp> {
+  async consultar(cuenta: Cuenta, idTexto: string): Promise<RespuestaHttp> {
     const id = this.validarId(idTexto);
+    const { sesion, completada } = await this.reanudarPropia(cuenta, id);
+    return { estado: 200, cuerpo: await this.estadoDe(sesion, completada) };
+  }
+
+  /** Reanuda una evaluación solo si es de esta cuenta; si es de otra persona, responde como si no existiera. */
+  private async reanudarPropia(cuenta: Cuenta, id: number) {
     const reanudada = await this.servicio.reanudarSesion(id);
-    if (reanudada === null) throw new ErrorHttp(404, "No existe esa evaluación");
-    return { estado: 200, cuerpo: await this.estadoDe(reanudada.sesion, reanudada.completada) };
+    if (reanudada === null || reanudada.sesion.usuarioId !== cuenta.id) throw new ErrorHttp(404, "No existe esa evaluación");
+    return reanudada;
   }
 
   // ---------------------------------------------------------------- construcción de la respuesta
@@ -190,23 +186,7 @@ export class ControladorApi {
 
   // ---------------------------------------------------------------- validación de entrada
 
-  private validarAlias(cuerpo: unknown): string {
-    const alias = typeof cuerpo === "object" && cuerpo !== null ? (cuerpo as { alias?: unknown }).alias : undefined;
-    if (typeof alias !== "string") throw new ErrorHttp(400, "Falta el nombre");
-    // eslint-disable-next-line no-control-regex
-    const limpio = alias.replace(/[\u0000-\u001f\u007f]/g, "").trim();
-    if (limpio.length === 0) throw new ErrorHttp(400, "Falta el nombre");
-    if (limpio.length > ALIAS_MAXIMO) throw new ErrorHttp(400, `El nombre no puede pasar de ${ALIAS_MAXIMO} letras`);
-    return limpio;
-  }
 
-  /** La clave del usuario es opcional: sin ella (o si no existe) se registra un usuario nuevo. */
-  private validarClaveOpcional(cuerpo: unknown): string | undefined {
-    const clave = (cuerpo as { clave?: unknown }).clave;
-    if (clave === undefined || clave === null) return undefined;
-    if (typeof clave !== "string" || clave.length > 36) throw new ErrorHttp(400, "La clave de usuario no es válida");
-    return clave;
-  }
 
   private validarRama(cuerpo: unknown): number {
     const rama = typeof cuerpo === "object" && cuerpo !== null ? (cuerpo as { ramaId?: unknown }).ramaId : undefined;
